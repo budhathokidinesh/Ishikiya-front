@@ -547,7 +547,7 @@
 
 "@tailwindcss/node@4.1.4":
   version "4.1.4"
-  resolved "https://registry.npmjs.org/@tailwindcss/node/-/node-4.1.4.tgz"
+  resolved "https://registry.yarnpkg.com/@tailwindcss/node/-/node-4.1.4.tgz#cfabbbcd53cbbae8a175dc744e6fe31e8ad43d3e"
   integrity sha512-MT5118zaiO6x6hNA04OWInuAiP1YISXql8Z+/Y8iisV5nuhM8VXlyhRuqc2PEviPszcXI66W44bCIk500Oolhw==
   dependencies:
     enhanced-resolve "^5.18.1"
@@ -562,7 +562,7 @@
 
 "@tailwindcss/oxide-darwin-arm64@4.1.4":
   version "4.1.4"
-  resolved "https://registry.npmjs.org/@tailwindcss/oxide-darwin-arm64/-/oxide-darwin-arm64-4.1.4.tgz"
+  resolved "https://registry.yarnpkg.com/@tailwindcss/oxide-darwin-arm64/-/oxide-darwin-arm64-4.1.4.tgz#878c0ea38fa277f058084bb1a91a4891d9049945"
   integrity sha512-JGRj0SYFuDuAGilWFBlshcexev2hOKfNkoX+0QTksKYq2zgF9VY/vVMq9m8IObYnLna0Xlg+ytCi2FN2rOL0Sg==
 
 "@tailwindcss/oxide-darwin-x64@4.1.4":
@@ -624,7 +624,7 @@
 
 "@tailwindcss/oxide@4.1.4":
   version "4.1.4"
-  resolved "https://registry.npmjs.org/@tailwindcss/oxide/-/oxide-4.1.4.tgz"
+  resolved "https://registry.yarnpkg.com/@tailwindcss/oxide/-/oxide-4.1.4.tgz#bf3bce61310b64bd47f61f12083ae4903a91ba8e"
   integrity sha512-p5wOpXyOJx7mKh5MXh5oKk+kqcz8T+bA3z/5VWWeQwFrmuBItGwz8Y2CHk/sJ+dNb9B0nYFfn0rj/cKHZyjahQ==
   optionalDependencies:
     "@tailwindcss/oxide-android-arm64" "4.1.4"
@@ -642,7 +642,7 @@
 
 "@tailwindcss/vite@^4.1.4":
   version "4.1.4"
-  resolved "https://registry.npmjs.org/@tailwindcss/vite/-/vite-4.1.4.tgz"
+  resolved "https://registry.yarnpkg.com/@tailwindcss/vite/-/vite-4.1.4.tgz#4ae66008e3f69499b7a951ba42aa4bc3cb2f7cd0"
   integrity sha512-4UQeMrONbvrsXKXXp/uxmdEN5JIJ9RkH7YVzs6AMxC/KC1+Np7WZBaNIco7TEjlkthqxZbt8pU/ipD+hKjm80A==
   dependencies:
     "@tailwindcss/node" "4.1.4"
@@ -877,6 +877,11 @@ csstype@^3.0.2:
   resolved "https://registry.npmjs.org/csstype/-/csstype-3.1.3.tgz"
   integrity sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==
 
+daisyui@^5.0.30:
+  version "5.0.30"
+  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-5.0.30.tgz#38adfaa27b49bc11b266a68b1943dc38f8154b38"
+  integrity sha512-eLQsjeYC3qDTjapQa30BP/qhdZ9y1II4ZXOEzJ9j0UKJePP3Rnh79rwZkMefkfozW2dgcx65cXTyzAUHLNoCYg==
+
 debug@^4.1.0, debug@^4.3.1, debug@^4.3.2:
   version "4.4.0"
   resolved "https://registry.npmjs.org/debug/-/debug-4.4.0.tgz"
@@ -896,7 +901,7 @@ delayed-stream@~1.0.0:
 
 detect-libc@^2.0.3:
   version "2.0.4"
-  resolved "https://registry.npmjs.org/detect-libc/-/detect-libc-2.0.4.tgz"
+  resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-2.0.4.tgz#f04715b8ba815e53b4d8109655b6508a6865a7e8"
   integrity sha512-3UDv+G9CsCKO1WKMGw9fwq/SWJYbI0c5Y7LU1AXYoDdbhE2AHQ6N6Nb34sG8Fj7T5APy8qXDCKuuIHd1BR0tVA==
 
 dunder-proto@^1.0.1:
@@ -915,7 +920,7 @@ electron-to-chromium@^1.5.73:
 
 enhanced-resolve@^5.18.1:
   version "5.18.1"
-  resolved "https://registry.npmjs.org/enhanced-resolve/-/enhanced-resolve-5.18.1.tgz"
+  resolved "https://registry.yarnpkg.com/enhanced-resolve/-/enhanced-resolve-5.18.1.tgz#728ab082f8b7b6836de51f1637aab5d3b9568faf"
   integrity sha512-ZSW3ma5GkcQBIpwZTSRAI8N71Uuwgs93IezB7mf7R60tC8ZbJideoDNKjHn2O9KIlx6rkGTTEk1xUCK2E1Y2Yg==
   dependencies:
     graceful-fs "^4.2.4"
@@ -1222,7 +1227,7 @@ gopd@^1.2.0:
 
 graceful-fs@^4.2.4:
   version "4.2.11"
-  resolved "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.11.tgz"
+  resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.11.tgz#4183e4e8bf08bb6e05bbb2f7d2e0c8f712ca40e3"
   integrity sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==
 
 has-flag@^4.0.0:
@@ -1286,7 +1291,7 @@ isexe@^2.0.0:
 
 jiti@^2.4.2:
   version "2.4.2"
-  resolved "https://registry.npmjs.org/jiti/-/jiti-2.4.2.tgz"
+  resolved "https://registry.yarnpkg.com/jiti/-/jiti-2.4.2.tgz#d19b7732ebb6116b06e2038da74a55366faef560"
   integrity sha512-rg9zJN+G4n2nfJl5MW3BMygZX56zKPNVEYYqq7adpmMh4Jn2QNEwhvQlFy6jPVdcod7txZtKHWnyZiA3a0zP7A==
 
 js-tokens@^4.0.0:
@@ -1343,7 +1348,7 @@ levn@^0.4.1:
 
 lightningcss-darwin-arm64@1.29.2:
   version "1.29.2"
-  resolved "https://registry.npmjs.org/lightningcss-darwin-arm64/-/lightningcss-darwin-arm64-1.29.2.tgz"
+  resolved "https://registry.yarnpkg.com/lightningcss-darwin-arm64/-/lightningcss-darwin-arm64-1.29.2.tgz#6ceff38b01134af48e859394e1ca21e5d49faae6"
   integrity sha512-cK/eMabSViKn/PG8U/a7aCorpeKLMlK0bQeNHmdb7qUnBkNPnL+oV5DjJUo0kqWsJUapZsM4jCfYItbqBDvlcA==
 
 lightningcss-darwin-x64@1.29.2:
@@ -1393,7 +1398,7 @@ lightningcss-win32-x64-msvc@1.29.2:
 
 lightningcss@1.29.2:
   version "1.29.2"
-  resolved "https://registry.npmjs.org/lightningcss/-/lightningcss-1.29.2.tgz"
+  resolved "https://registry.yarnpkg.com/lightningcss/-/lightningcss-1.29.2.tgz#f5f0fd6e63292a232697e6fe709da5b47624def3"
   integrity sha512-6b6gd/RUXKaw5keVdSEtqFVdzWnU5jMxTUjA2bVcMNPLwSQ08Sv/UodBVtETLCn7k4S1Ibxwh7k68IwLZPgKaA==
   dependencies:
     detect-libc "^2.0.3"
@@ -1561,6 +1566,11 @@ react-dom@^19.0.0:
   dependencies:
     scheduler "^0.26.0"
 
+react-icons@^5.5.0:
+  version "5.5.0"
+  resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-5.5.0.tgz#8aa25d3543ff84231685d3331164c00299cdfaf2"
+  integrity sha512-MEFcXdkP3dLo8uumGI5xN3lDFNsRtrjbOEKDLD7yv76v4wpnEq2Lt2qeHaQOr34I/wPN3s3+N08WkQ+CW37Xiw==
+
 react-refresh@^0.17.0:
   version "0.17.0"
   resolved "https://registry.npmjs.org/react-refresh/-/react-refresh-0.17.0.tgz"
@@ -1679,12 +1689,12 @@ tailwind-merge@^3.2.0:
 
 tailwindcss@4.1.4, tailwindcss@^4.1.4:
   version "4.1.4"
-  resolved "https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.1.4.tgz"
+  resolved "https://registry.yarnpkg.com/tailwindcss/-/tailwindcss-4.1.4.tgz#27b3c910c6f1a47f4540451f3faf7cdd6d977a69"
   integrity sha512-1ZIUqtPITFbv/DxRmDr5/agPqJwF69d24m9qmM1939TJehgY539CtzeZRjbLt5G6fSy/7YqqYsfvoTEw9xUI2A==
 
 tapable@^2.2.0:
   version "2.2.1"
-  resolved "https://registry.npmjs.org/tapable/-/tapable-2.2.1.tgz"
+  resolved "https://registry.yarnpkg.com/tapable/-/tapable-2.2.1.tgz#1967a73ef4060a82f12ab96af86d52fdb76eeca0"
   integrity sha512-GNzQvQTOIP6RyTfE2Qxb8ZVlNmw0n88vp1szwWRimP02mnTsx3Wtn5qRdqY9w2XduFNUgvOwhNnQsjwCp+kqaQ==
 
 tinyglobby@^0.2.13:
