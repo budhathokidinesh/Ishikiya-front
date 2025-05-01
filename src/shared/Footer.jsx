@@ -4,31 +4,36 @@ import { FaInstagram } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 const Footer = () => {
   return (
-    <footer className="footer footer-horizontal  w-full bg-red-200 footer-center text-base-content rounded p-10">
-      <nav className="grid grid-flow-col gap-4">
-        <a className="link link-hover">About us</a>
-        <a className="link link-hover">Contact</a>
-        <a className="link link-hover">Jobs</a>
-        <a className="link link-hover">Press kit</a>
+    <footer className="footer footer-horizontal bg-red-200 text-base-content rounded p-10 footer-center">
+      <nav className="grid grid-flow-col gap-4 text-xl font-bold ">
+        <a href="" className="hover:text-red-400 ">
+          About Us
+        </a>
+        <a href="" className="hover:text-red-400 ">
+          Contact Us
+        </a>
+        <a href="" className="hover:text-red-400 ">
+          Our Menu
+        </a>
       </nav>
       <nav>
-        <div className="grid grid-flow-col gap-4">
+        <div className="grid grid-flow-col gap-8 text-2xl">
           <a href="https://www.facebook.com/ALKIMOSBEACHFISHCHIPS">
-            <FaFacebookF />
+            <FaFacebookF className="hover:text-blue-400 " />
           </a>
 
           <a href="">
-            <FaInstagram />
+            <FaInstagram className="hover:text-blue-400 " />
           </a>
           <a href="">
-            <FaXTwitter />
+            <FaXTwitter className="hover:text-blue-400 " />
           </a>
         </div>
       </nav>
       <aside>
         <p>
           Copyright © {new Date().getFullYear()} - All right reserved by Alkimos
-          Beach Fish and Chips
+          Beach Fish and Chips.
         </p>
       </aside>
     </footer>

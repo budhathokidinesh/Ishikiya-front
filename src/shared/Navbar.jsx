@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { RxCross2 } from "react-icons/rx";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [nav, setNav] = useState(false);
@@ -12,7 +13,10 @@ const Navbar = () => {
     <div className="bg-white/80 shadow-md fixed top-0 left-0 w-full z-40 ease-in duration-300 backdrop-blur-md">
       <div className="py-3 px-10 sm:px-4 md:px-6 lg:px-6 container mx-auto">
         <div className="flex items-center justify-between ">
-          <img src="./logo.png" alt="" className="h-14 cursor-pointer" />
+          <Link to="/">
+            <img src="./logo.png" alt="" className="h-14 cursor-pointer" />
+          </Link>
+
           {/* All links  */}
           <div className="lg:flex hidden gap-8 items-center">
             <a
@@ -45,9 +49,11 @@ const Navbar = () => {
             >
               Popular Food
             </a>
-            <button className="bg-[#F54748] active:scale-90 transition duration-100 transform hover:shadow-xl shadow-md rounded-full px-8 py-2 text-xl font-medium text-white cursor-pointer">
-              Login
-            </button>
+            <Link to="/login">
+              <button className="bg-[#F54748] active:scale-90 transition duration-100 transform hover:shadow-xl shadow-md rounded-full px-8 py-2 text-xl font-medium text-white cursor-pointer">
+                Login
+              </button>
+            </Link>
           </div>
           {/* Hamburgur  */}
           <div className="block lg:hidden z-40" onClick={handleNav}>
@@ -92,14 +98,16 @@ const Navbar = () => {
                 Add Menu
               </a>
               <a
-                href=""
+                href="/popular"
                 className="text-[#191919] text-xl font-medium hover:text-red-500"
               >
                 Popular Food
               </a>
-              <button className="bg-[#F54748] active:scale-90 transition duration-100 transform hover:shadow-xl shadow-md rounded-full px-8 py-2 text-xl font-medium text-white cursor-pointer">
-                Login
-              </button>
+              <Link to="/login">
+                <button className="bg-[#F54748] active:scale-90 transition duration-100 transform hover:shadow-xl shadow-md rounded-full px-8 py-2 text-xl font-medium text-white cursor-pointer">
+                  Login
+                </button>
+              </Link>
             </div>
           </div>
         </div>
