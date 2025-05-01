@@ -6,7 +6,7 @@ import { FaArrowAltCircleRight } from "react-icons/fa";
 const Header = () => {
   return (
     <div className="py-3 px-10 sm:px-4 md:px-6 lg:px-6">
-      <div className="container mx-auto py-[15vh]">
+      <div className="container w-full py-[15vh]">
         <div className="grid grid-cols-1 relative lg:grid-cols-2 gap-10">
           <div className="lg:w-[32rem] w-full flex flex-col space-y-6">
             {/* Title  */}
