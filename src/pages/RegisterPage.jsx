@@ -69,7 +69,7 @@ const RegisterPage = () => {
         setLoading(false);
         if (data?.payload?.success) {
           toast(data?.payload?.message);
-          navigate("/login");
+          navigate("/verify-otp");
         } else {
           if (data?.payload?.code === "EMAAIL_EXISTS") {
             toast.error("Email already exists. Please login now.");

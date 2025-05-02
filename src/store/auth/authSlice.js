@@ -8,6 +8,8 @@ const initialState = {
   isLoading: false,
   user: null,
   error: null,
+  email: null,
+  isOtpVerified: false,
 };
 //this is register user asyncthunk
 export const registerUser = createAsyncThunk(
@@ -21,8 +23,18 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+//verify otp
+export const verifyOtp = createAsyncThunk(
+  "user/verifyOtp",
+  async (formData) => {
+    const response = await axios.post(
+      `${BASE_URL}/api/v1/auth/verify-otp`,
+      formData
+    );
+    return response.data;
+  }
+);
 //this is for login user
-
 export const loginUser = createAsyncThunk(
   "user/loginUser",
   async (formData) => {
@@ -66,6 +78,18 @@ const userSlice = createSlice({
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
         state.user = null;
+        state.error = action.error.message || "Something went wrong";
+      })
+      .addCase(verifyOtp.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(verifyOtp.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isOtpVerified = true;
+      })
+      .addCase(verifyOtp.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isOtpVerified = false;
         state.error = action.error.message || "Something went wrong";
       })
       .addCase(loginUser.pending, (state) => {

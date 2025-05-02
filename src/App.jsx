@@ -5,6 +5,8 @@ import Footer from "./shared/Footer";
 import Navbar from "./shared/Navbar";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import OtpVerifyPage from "./pages/OtpVerifyPage";
+import ForgotResetPasswordPage from "./pages/ForgotPasswordPage";
 
 function App() {
   return (
@@ -14,6 +16,8 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/verify-otp" element={<OtpVerifyPage />} />
+        <Route path="/forgot-password" element={<ForgotResetPasswordPage />} />
       </Routes>
       <Footer />
     </>
