@@ -18,6 +18,10 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/verify-otp" element={<OtpVerifyPage />} />
         <Route path="/forgot-password" element={<ForgotResetPasswordPage />} />
+        <Route
+          path="/forgot-password/:token"
+          element={<ForgotResetPasswordPage />}
+        />
       </Routes>
       <Footer />
     </>

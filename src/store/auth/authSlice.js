@@ -5,6 +5,7 @@ const BASE_URL = import.meta.env.VITE_API_URL.replace(/\/+$/, "");
 
 //this is initial state
 const initialState = {
+  isAuthenticated: false,
   isLoading: false,
   user: null,
   error: null,
@@ -34,6 +35,14 @@ export const verifyOtp = createAsyncThunk(
     return response.data;
   }
 );
+
+//this is for checking auth
+export const checkAuth = createAsyncThunk("user/checkAuth", async () => {
+  const response = await axios.get(`${BASE_URL}/api/v1/auth/check-auth`, {
+    withCredentials: true,
+  });
+  return response.data;
+});
 //this is for login user
 export const loginUser = createAsyncThunk(
   "user/loginUser",
@@ -91,6 +100,19 @@ const userSlice = createSlice({
         state.isLoading = false;
         state.isOtpVerified = false;
         state.error = action.error.message || "Something went wrong";
+      })
+      .addCase(checkAuth.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(checkAuth.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload.success ? action.payload.user : null;
+        state.isAuthenticated = action.payload.success ? true : false;
+      })
+      .addCase(checkAuth.rejected, (state, action) => {
+        state.isLoading = false;
+        state.user = null;
+        state.isAuthenticated = false;
       })
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useParams } from "react-router-dom";
 
 const BASE_URL = import.meta.env.VITE_API_URL.replace(/\/+$/, "");
 
@@ -10,11 +11,9 @@ const ForgotResetPasswordPage = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const location = useLocation();
   const navigate = useNavigate();
 
-  const searchParams = new URLSearchParams(location.search);
-  const token = searchParams.get("token");
+  const { token } = useParams();
 
   const handleForgot = async (e) => {
     e.preventDefault();
@@ -45,7 +44,7 @@ const ForgotResetPasswordPage = () => {
       const res = await axios.post(
         `${BASE_URL}/api/v1/auth/reset-password/${token}`,
         {
-          newPassword,
+          password: newPassword,
         }
       );
       toast.success(res.data.message || "Password reset successful");
