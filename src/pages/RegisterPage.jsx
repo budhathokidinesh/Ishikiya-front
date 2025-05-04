@@ -21,6 +21,7 @@ const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  //password matching
   const isPasswordMismatch =
     formData.password &&
     formData.confirmPassword &&

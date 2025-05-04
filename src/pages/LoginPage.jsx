@@ -1,11 +1,67 @@
-import React from "react";
-import { Link, NavLink } from "react-router-dom";
+import { loginUser } from "@/store/auth/authSlice";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+const initialState = {
+  email: "",
+  password: "",
+};
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState(initialState);
+
+  //this is for handling change
+  const handleOnChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  //this is handling submit
+  const handleOnSubmit = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    //combining image url as well
+    dispatch(loginUser(formData))
+      .then((data) => {
+        setLoading(false);
+        if (data?.payload?.success) {
+          toast(data?.payload?.message);
+          //redirecting based on verfification and role
+          const user = data?.payload?.user;
+          if (user && user?.isVerified === false) {
+            toast(data?.payload?.message || "Please verify your account.");
+            navigate("/verify-otp");
+          } else if (user?.role === "admin") {
+            navigate("/admin/dashboard");
+          } else {
+            navigate("/shop/home");
+          }
+        } else {
+          toast.error(data?.payload?.message || "Please register your account");
+          navigate("/register");
+        }
+      })
+      .catch((err) => {
+        setLoading(false);
+        toast.error("Something went wrong. Please try again.");
+      });
+  };
+  console.log(formData);
   return (
     <div className="login">
       <div className="h-[85vh] pt-[17vh]">
-        <form className="ease-in duration-300 w-[88%] sm:w-max shadow-sm backdrop-blur-md bg-white/80 lg:w-max mx-auto flex flex-col items-center rounded-md px-8 py-5">
+        <form
+          onSubmit={handleOnSubmit}
+          className="ease-in duration-300 w-[88%] sm:w-max shadow-sm backdrop-blur-md bg-white/80 lg:w-max mx-auto flex flex-col items-center rounded-md px-8 py-5"
+        >
           <NavLink to="/">
             <img
               src="./logo.png"
@@ -23,6 +79,8 @@ const LoginPage = () => {
               name="email"
               placeholder="youremail@site.com"
               required
+              value={formData.email}
+              onChange={handleOnChange}
               className="shadow-sm bg-white appearance-none border rounded w-full py-2 px-3 sm:w-[20rem] text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             />
           </div>
@@ -39,7 +97,8 @@ const LoginPage = () => {
               name="password"
               required
               placeholder="Password"
-              title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
+              value={formData.password}
+              onChange={handleOnChange}
               className="shadow-sm bg-white appearance-none border rounded w-full py-2 px-3 sm:w-[20rem] text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             />
           </div>

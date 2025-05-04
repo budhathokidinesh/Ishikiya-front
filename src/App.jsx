@@ -7,6 +7,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import OtpVerifyPage from "./pages/OtpVerifyPage";
 import ForgotResetPasswordPage from "./pages/ForgotPasswordPage";
+import AddFood from "./pages/AddFood";
 
 function App() {
   return (
@@ -22,7 +23,9 @@ function App() {
           path="/forgot-password/:token"
           element={<ForgotResetPasswordPage />}
         />
+        <Route path="/addfood" element={<AddFood />} />
       </Routes>
+
       <Footer />
     </>
   );
