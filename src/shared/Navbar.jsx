@@ -49,12 +49,13 @@ const Navbar = () => {
             >
               About Us
             </a>
-            <a
-              href=""
+            <Link
+              to="/menu"
               className="text-[#191919] text-xl font-medium hover:text-red-500"
             >
               Our Menu
-            </a>
+            </Link>
+
             {user?.role === "admin" && (
               <Link
                 to="/addfood"

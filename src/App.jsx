@@ -8,6 +8,7 @@ import RegisterPage from "./pages/RegisterPage";
 import OtpVerifyPage from "./pages/OtpVerifyPage";
 import ForgotResetPasswordPage from "./pages/ForgotPasswordPage";
 import AddFood from "./pages/AddFood";
+import MenuPage from "./pages/MenuPage";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           element={<ForgotResetPasswordPage />}
         />
         <Route path="/addfood" element={<AddFood />} />
+        <Route path="/menu" element={<MenuPage />} />
       </Routes>
 
       <Footer />
