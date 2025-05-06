@@ -4,9 +4,9 @@ import axios from "axios";
 
 const initialState = {
   isLoading: false,
-  productList: [],
+  foodList: [],
 };
-
+//this is for adding food
 export const addNewFood = createAsyncThunk(
   "food/addNewFood",
   async (formData, { rejectWithValue }) => {
@@ -22,6 +22,7 @@ export const addNewFood = createAsyncThunk(
     }
   }
 );
+//this is for fetching all foods
 export const fetchAllFoods = createAsyncThunk(
   "food/fetchAllFoods",
   async (_, { rejectWithValue }) => {
@@ -33,6 +34,19 @@ export const fetchAllFoods = createAsyncThunk(
     }
   }
 );
+//this is for getting single food
+export const getFood = createAsyncThunk(
+  "food/getFood",
+  async (id, { rejectWithValue }) => {
+    try {
+      const result = await axios.get(`${BASE_URL}/api/v1/food/getFood/${id}`);
+      return result?.data;
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
+//this is for editing food
 export const editFood = createAsyncThunk(
   "food/editFood",
   async ({ id, formData }, { rejectWithValue }) => {
@@ -47,6 +61,7 @@ export const editFood = createAsyncThunk(
     }
   }
 );
+//this is for deleting food
 export const deleteFood = createAsyncThunk(
   "food/deleteFood",
   async (id, { rejectWithValue }) => {
@@ -61,7 +76,7 @@ export const deleteFood = createAsyncThunk(
   }
 );
 const AdminProductsSlice = createSlice({
-  name: "adminProducts",
+  name: "adminFood",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -72,10 +87,10 @@ const AdminProductsSlice = createSlice({
       .addCase(fetchAllFoods.fulfilled, (state, action) => {
         console.log(action.payload);
         state.isLoading = false;
-        state.productList = action.payload.data;
+        state.foodList = action.payload.foods;
       })
       .addCase(fetchAllFoods.rejected, (state) => {
-        (state.isLoading = false), (state.productList = []);
+        (state.isLoading = false), (state.foodList = []);
       });
   },
 });

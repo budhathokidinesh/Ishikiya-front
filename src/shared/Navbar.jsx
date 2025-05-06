@@ -43,12 +43,13 @@ const Navbar = () => {
             >
               Today Special
             </a>
-            <a
-              href=""
+            <Link
+              to="/aboutus"
               className="text-[#191919] text-xl font-medium hover:text-red-500"
             >
               About Us
-            </a>
+            </Link>
+
             <Link
               to="/menu"
               className="text-[#191919] text-xl font-medium hover:text-red-500"

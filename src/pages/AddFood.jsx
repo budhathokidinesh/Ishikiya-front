@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { addNewFood } from "@/store/admin/productSlice";
+import { addNewFood } from "@/store/admin/foodSlice";
 
 const initialState = {
   title: "",
@@ -138,7 +138,7 @@ const AddFood = () => {
                 className="select"
               >
                 <option value="" disabled>
-                  Pick your category
+                  Category
                 </option>
                 <option value="Fish and chips">Fish and chips</option>
                 <option value="Drinks">Drinks</option>
@@ -187,6 +187,13 @@ const AddFood = () => {
             </div>
             {/* this is for Images  */}
             <div className="mb-3">
+              <input
+                accept=".jpg .png .jpeg"
+                onChange={handleImage}
+                name="myFile"
+                type="file"
+                className="file-input file-input-ghost"
+              />
               <label className="block text-gray-700 text-sm mb-2">
                 Add Images
                 {uploading && (
@@ -195,13 +202,6 @@ const AddFood = () => {
                   </div>
                 )}
               </label>
-              <input
-                accept=".jpg .png .jpeg"
-                onChange={handleImage}
-                name="myFile"
-                type="file"
-                className="file-input file-input-ghost"
-              />
             </div>
 
             <button

@@ -9,6 +9,8 @@ import OtpVerifyPage from "./pages/OtpVerifyPage";
 import ForgotResetPasswordPage from "./pages/ForgotPasswordPage";
 import AddFood from "./pages/AddFood";
 import MenuPage from "./pages/MenuPage";
+import AboutUsPage from "./pages/AboutUsPage";
+import FodDetail from "./pages/FodDetail";
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
         />
         <Route path="/addfood" element={<AddFood />} />
         <Route path="/menu" element={<MenuPage />} />
+        <Route path="/aboutus" element={<AboutUsPage />} />
+        <Route path="/fooddetail/:id" element={<FodDetail />} />
       </Routes>
 
       <Footer />
