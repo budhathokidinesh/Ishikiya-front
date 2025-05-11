@@ -1,4 +1,4 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
@@ -70,3 +70,74 @@ export const updateCartItem = createAsyncThunk(
     }
   }
 );
+//remove from the cart
+export const removeFromCart = createAsyncThunk(
+  "cart/removeFromCart",
+  async (productId, { rejectWithValue }) => {
+    try {
+      const response = await axios.delete(
+        `${BASE_URL}/api/v1/cart/deleteCartItem`,
+        {
+          data: { productId },
+          withCredentials: true,
+        }
+      );
+      return response.data.cart;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to remove item"
+      );
+    }
+  }
+);
+//clear cart
+export const clearCart = createAsyncThunk(
+  "cart/clearCart",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.delete(`${BASE_URL}/api/v1/cart/clearCart`, {
+        withCredentials: true,
+      });
+      return response.data.cart;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to clear cart"
+      );
+    }
+  }
+);
+//cart slice
+const cartSlice = createSlice({
+  name: "cart",
+  initialState,
+  reducers: {
+    resetCart: (state) => {
+      state.cartItems = [];
+      state.totalQuantity = 0;
+      state.totalPrice = 0;
+      state.error = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      //load cart
+      .addCase(fetchCart.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchCart.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.cartItems = action.payload.items;
+        state.totalQuantity = action.payload.items.reduce(
+          (total, item) => total + item.quantity
+        );
+        state.totalPrice = action.payload.items.reduce(
+          (total, item) => total + item.total
+        );
+      })
+      .addCase(fetchCart.rejected, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      });
+  },
+});
