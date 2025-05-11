@@ -129,15 +129,62 @@ const cartSlice = createSlice({
         state.isLoading = false;
         state.cartItems = action.payload.items;
         state.totalQuantity = action.payload.items.reduce(
-          (total, item) => total + item.quantity
+          (total, item) => total + item.quantity,
+          0
         );
         state.totalPrice = action.payload.items.reduce(
-          (total, item) => total + item.total
+          (total, item) => total + item.total,
+          0
         );
       })
-      .addCase(fetchCart.rejected, (state) => {
-        state.isLoading = true;
-        state.error = null;
+      .addCase(fetchCart.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+        //this is for add to cart
+      })
+      .addCase(addToCart.fulfilled, (state, action) => {
+        state.cartItems = action.payload.items;
+        state.totalQuantity = action.payload.items.reduce(
+          (total, item) => total + item.quantity,
+          0
+        );
+        state.totalPrice = action.payload.items.reduce(
+          (total, item) => total + item.total,
+          0
+        );
+        //this is for updating the cart items
+      })
+      .addCase(updateCartItem.fulfilled, (state, action) => {
+        state.cartItems = action.payload.items;
+        state.totalQuantity = action.payload.items.reduce(
+          (total, item) => total + item.quantity,
+          0
+        );
+        state.totalPrice = action.payload.items.reduce(
+          (total, item) => total + item.total,
+          0
+        );
+        //this is for removing from the cart
+      })
+      .addCase(removeFromCart.fulfilled, (state, action) => {
+        state.cartItems = action.payload.items;
+        state.totalQuantity = action.payload.items.reduce(
+          (total, item) => total + item.quantity,
+          0
+        );
+        state.totalPrice = action.payload.items.reduce(
+          (total, item) => total + item.total,
+          0
+        );
+        //this is for clear the cart
+      })
+      .addCase(clearCart.fulfilled, (state) => {
+        state.cartItems = [];
+        state.totalQuantity = 0;
+        state.totalPrice = 0;
       });
   },
 });
+//actions
+export const { resetCart } = cartSlice.actions;
+export default cartSlice.reducer;
