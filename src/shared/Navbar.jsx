@@ -37,12 +37,13 @@ const Navbar = () => {
 
           {/* All links  */}
           <div className="lg:flex hidden gap-8 items-center">
-            <a
-              href=""
+            <Link
+              to="/menu"
               className="text-[#191919] text-xl font-medium hover:text-red-500"
             >
               Today Special
-            </a>
+            </Link>
+
             <Link
               to="/aboutus"
               className="text-[#191919] text-xl font-medium hover:text-red-500"
@@ -66,12 +67,6 @@ const Navbar = () => {
               </Link>
             )}
 
-            <a
-              href=""
-              className="text-[#191919] text-xl font-medium hover:text-red-500"
-            >
-              Popular Food
-            </a>
             {user ? (
               <div className="dropdown dropdown-end">
                 <div
@@ -90,15 +85,8 @@ const Navbar = () => {
                   tabIndex={0}
                   className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
                 >
-                  <li>
-                    <a className="justify-between">
-                      Profile
-                      <span className="badge">New</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a>Settings</a>
-                  </li>
+                  <Link to="/profile">Profile</Link>
+
                   <li>
                     <button onClick={handleOnLogout}>Logout</button>
                   </li>

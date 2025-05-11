@@ -11,6 +11,7 @@ import AddFood from "./pages/AddFood";
 import MenuPage from "./pages/MenuPage";
 import AboutUsPage from "./pages/AboutUsPage";
 import FodDetail from "./pages/FodDetail";
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/menu" element={<MenuPage />} />
         <Route path="/aboutus" element={<AboutUsPage />} />
         <Route path="/fooddetail/:id" element={<FodDetail />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
 
       <Footer />
