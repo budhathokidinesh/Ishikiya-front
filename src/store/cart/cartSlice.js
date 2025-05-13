@@ -17,7 +17,7 @@ export const fetchCart = createAsyncThunk(
   "cart/fetchCart",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/v1/getCart`, {
+      const response = await axios.get(`${BASE_URL}/api/v1/cart/getCart`, {
         withCredentials: true,
       });
       return response.data.cart;
@@ -32,11 +32,11 @@ export const fetchCart = createAsyncThunk(
 //add to cart
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
-  async ({ productId, quantity = 1 }, { rejectWithValue }) => {
+  async ({ foodId, quantity = 1 }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        `${BASE_URL}/api/v1/addCart`,
-        { productId, quantity },
+        `${BASE_URL}/api/v1/cart/addCart`,
+        { foodId, quantity },
         {
           withCredentials: true,
         }
@@ -53,11 +53,11 @@ export const addToCart = createAsyncThunk(
 //update the cart
 export const updateCartItem = createAsyncThunk(
   "cart/updateCartItem",
-  async ({ productId, quantity }, { rejectWithValue }) => {
+  async ({ foodId, quantity }, { rejectWithValue }) => {
     try {
       const response = await axios.put(
-        `${BASE_URL}/api/v1/updateCart`,
-        { productId, quantity },
+        `${BASE_URL}/api/v1/cart/updateCart`,
+        { foodId, quantity },
         {
           withCredentials: true,
         }
@@ -73,12 +73,12 @@ export const updateCartItem = createAsyncThunk(
 //remove from the cart
 export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
-  async (productId, { rejectWithValue }) => {
+  async ({ foodId }, { rejectWithValue }) => {
     try {
       const response = await axios.delete(
         `${BASE_URL}/api/v1/cart/deleteCartItem`,
         {
-          data: { productId },
+          data: { foodId },
           withCredentials: true,
         }
       );
@@ -128,11 +128,11 @@ const cartSlice = createSlice({
       .addCase(fetchCart.fulfilled, (state, action) => {
         state.isLoading = false;
         state.cartItems = action.payload.items;
-        state.totalQuantity = action.payload.items.reduce(
+        state.totalQuantity = state.cartItems?.reduce(
           (total, item) => total + item.quantity,
           0
         );
-        state.totalPrice = action.payload.items.reduce(
+        state.totalPrice = state.cartItems?.reduce(
           (total, item) => total + item.total,
           0
         );
@@ -140,27 +140,29 @@ const cartSlice = createSlice({
       .addCase(fetchCart.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+
         //this is for add to cart
       })
       .addCase(addToCart.fulfilled, (state, action) => {
         state.cartItems = action.payload.items;
-        state.totalQuantity = action.payload.items.reduce(
+        state.totalQuantity = action.cartItems?.reduce(
           (total, item) => total + item.quantity,
           0
         );
-        state.totalPrice = action.payload.items.reduce(
+        state.totalPrice = action.cartItems?.reduce(
           (total, item) => total + item.total,
           0
         );
+
         //this is for updating the cart items
       })
       .addCase(updateCartItem.fulfilled, (state, action) => {
         state.cartItems = action.payload.items;
-        state.totalQuantity = action.payload.items.reduce(
+        state.totalQuantity = action.cartItems?.reduce(
           (total, item) => total + item.quantity,
           0
         );
-        state.totalPrice = action.payload.items.reduce(
+        state.totalPrice = action.cartItems?.reduce(
           (total, item) => total + item.total,
           0
         );
@@ -168,11 +170,11 @@ const cartSlice = createSlice({
       })
       .addCase(removeFromCart.fulfilled, (state, action) => {
         state.cartItems = action.payload.items;
-        state.totalQuantity = action.payload.items.reduce(
+        state.totalQuantity = action.cartItems?.reduce(
           (total, item) => total + item.quantity,
           0
         );
-        state.totalPrice = action.payload.items.reduce(
+        state.totalPrice = action.cartItems?.reduce(
           (total, item) => total + item.total,
           0
         );
