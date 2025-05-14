@@ -145,11 +145,11 @@ const cartSlice = createSlice({
       })
       .addCase(addToCart.fulfilled, (state, action) => {
         state.cartItems = action.payload.items;
-        state.totalQuantity = action.cartItems?.reduce(
+        state.totalQuantity = action.payload.items.reduce(
           (total, item) => total + item.quantity,
           0
         );
-        state.totalPrice = action.cartItems?.reduce(
+        state.totalPrice = action.payload.items.reduce(
           (total, item) => total + item.total,
           0
         );
@@ -158,11 +158,11 @@ const cartSlice = createSlice({
       })
       .addCase(updateCartItem.fulfilled, (state, action) => {
         state.cartItems = action.payload.items;
-        state.totalQuantity = action.cartItems?.reduce(
+        state.totalQuantity = action.payload.items.reduce(
           (total, item) => total + item.quantity,
           0
         );
-        state.totalPrice = action.cartItems?.reduce(
+        state.totalPrice = action.payload.items.reduce(
           (total, item) => total + item.total,
           0
         );
@@ -170,11 +170,11 @@ const cartSlice = createSlice({
       })
       .addCase(removeFromCart.fulfilled, (state, action) => {
         state.cartItems = action.payload.items;
-        state.totalQuantity = action.cartItems?.reduce(
+        state.totalQuantity = action.payload.items.reduce(
           (total, item) => total + item.quantity,
           0
         );
-        state.totalPrice = action.cartItems?.reduce(
+        state.totalPrice = action.payload.items.reduce(
           (total, item) => total + item.total,
           0
         );

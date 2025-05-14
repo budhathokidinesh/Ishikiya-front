@@ -42,7 +42,7 @@ const LoginPage = () => {
           } else if (user?.role === "admin") {
             navigate("/admin/dashboard");
           } else {
-            navigate("/shop/home");
+            navigate("/menu");
           }
         } else {
           toast.error(data?.payload?.message || "Please register your account");

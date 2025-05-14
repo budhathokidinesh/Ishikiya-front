@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CiStar } from "react-icons/ci";
 import { Link, useParams } from "react-router-dom";
-import { addToCart } from "@/store/cart/cartSlice";
+import { addToCart, fetchCart } from "@/store/cart/cartSlice";
 
 const MenuPage = () => {
   const dispatch = useDispatch();
@@ -59,7 +59,8 @@ const MenuPage = () => {
       foodId: item._id,
       quantity: 1,
     };
-    dispatch(addToCart(selectedItem));
+    dispatch(addToCart(selectedItem)).unwrap();
+    dispatch(fetchCart());
   };
   return (
     <div className="pt-[16vh] px-10 sm:px-4 md:px-6">
