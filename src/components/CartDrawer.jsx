@@ -7,11 +7,51 @@ import {
   removeFromCart,
   updateCartItem,
 } from "@/store/cart/cartSlice";
+import { placeOrder } from "@/store/order/orderSlice";
 
 const CartDrawer = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
   const { cartItems, totalPrice } = useSelector((state) => state.cart);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+
+  //this is for handling in checkout
+  const handleOnCheckout = async () => {
+    if (cartItems.length === 0) {
+      alert("Your cart is empty");
+      return;
+    }
+
+    try {
+      const orderData = {
+        cart: cartItems.map((item) => ({
+          foodId: item.food._id,
+          quantity: item.quantity,
+        })),
+        paymentMethod: "Stripe",
+      };
+
+      // Dispatch the action
+      const response = await dispatch(placeOrder(orderData)).unwrap();
+      console.log("Stripe Response:", response);
+
+      // Handle the response
+      if (response?.url) {
+        // Redirect to Stripe
+        window.location.href = response.url;
+      } else if (response?.order) {
+        // Handle non-Stripe success case
+        alert("Order placed successfully!");
+        onClose();
+      } else {
+        throw new Error("Unexpected response format");
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert(error.message || "Payment processing failed");
+      // Optionally clear loading state
+      dispatch(clearOrderError());
+    }
+  };
 
   const drawerRef = useRef(null);
   //This is for closing cart drawer while clicking outside without any re-render the dom
@@ -206,7 +246,10 @@ const CartDrawer = ({ isOpen, onClose }) => {
                 <FiTrash2 />
                 {showClearConfirm ? "Cancel" : "Clear Cart"}
               </button>
-              <button className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-medium transition cursor-pointer">
+              <button
+                onClick={handleOnCheckout}
+                className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-medium transition cursor-pointer"
+              >
                 Proceed to Checkout
               </button>
             </div>
