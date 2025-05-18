@@ -12,6 +12,8 @@ import MenuPage from "./pages/MenuPage";
 import AboutUsPage from "./pages/AboutUsPage";
 import FodDetail from "./pages/FodDetail";
 import ProfilePage from "./pages/ProfilePage";
+import SuccessPage from "./pages/SuccessPage";
+import { CancelPage } from "./pages/CancelPage";
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
         <Route path="/aboutus" element={<AboutUsPage />} />
         <Route path="/fooddetail/:id" element={<FodDetail />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/order-success" element={<SuccessPage />} />
+        <Route path="/cancel" element={<CancelPage />} />
       </Routes>
 
       <Footer />

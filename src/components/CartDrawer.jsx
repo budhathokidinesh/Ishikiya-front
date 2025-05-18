@@ -41,6 +41,8 @@ const CartDrawer = ({ isOpen, onClose }) => {
       } else if (response?.order) {
         // Handle non-Stripe success case
         alert("Order placed successfully!");
+        // Optionally clear loading state
+        dispatch(clearCart());
         onClose();
       } else {
         throw new Error("Unexpected response format");
@@ -48,8 +50,6 @@ const CartDrawer = ({ isOpen, onClose }) => {
     } catch (error) {
       console.error("Checkout error:", error);
       alert(error.message || "Payment processing failed");
-      // Optionally clear loading state
-      dispatch(clearOrderError());
     }
   };
 
