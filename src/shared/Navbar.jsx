@@ -67,12 +67,21 @@ const Navbar = () => {
                 Today Special
               </Link>
 
-              <Link
-                to="/aboutus"
-                className="text-[#191919] text-xl font-medium hover:text-red-500"
-              >
-                About Us
-              </Link>
+              {user?.role === "admin" ? (
+                <Link
+                  to="/admin-order"
+                  className="text-[#191919] text-xl font-medium hover:text-red-500"
+                >
+                  Orders
+                </Link>
+              ) : (
+                <Link
+                  to="/aboutus"
+                  className="text-[#191919] text-xl font-medium hover:text-red-500"
+                >
+                  About Us
+                </Link>
+              )}
 
               <Link
                 to="/menu"

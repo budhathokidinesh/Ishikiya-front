@@ -1,23 +1,37 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllOrdersAdmin, changeOrderStatus } from "../redux/orderSlice";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  changeOrderStatus,
+  fetchAllOrdersAdmin,
+} from "@/store/order/orderSlice";
 
 const AdminOrderPage = () => {
   const dispatch = useDispatch();
-  const { orders, isLoading, error } = useSelector((state) => state.orders);
+  const { orders, isLoading, error } = useSelector((state) => state.order);
 
   useEffect(() => {
     dispatch(fetchAllOrdersAdmin());
   }, [dispatch]);
 
-  const handleStatusChange = (orderId, status) => {
-    dispatch(changeOrderStatus({ orderId, status }));
+  const handleStatusChange = async (orderId, status) => {
+    try {
+      const result = await dispatch(
+        changeOrderStatus({ orderId, status })
+      ).unwrap();
+      if (result) {
+        // Update the specific order's status directly in state
+        dispatch(fetchAllOrdersAdmin());
+      }
+    } catch (error) {
+      console.error("Failed to update order status:", error);
+    }
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="pt-[18vh] max-w-4xl mx-auto">
       <h2 className="text-3xl font-bold mb-6">Admin Orders</h2>
       {isLoading ? (
         <p className="text-center">Loading...</p>

@@ -114,10 +114,14 @@ const orderSlice = createSlice({
         state.orders = action.payload;
       })
       .addCase(changeOrderStatus.fulfilled, (state, action) => {
+        const updatedOrder = action.payload;
         const index = state.orders.findIndex(
-          (order) => order._id === action.payload._id
+          (order) => order._id === updatedOrder._id
         );
-        if (index !== -1) state.orders[index] = action.payload;
+
+        if (index !== -1) {
+          state.orders[index].payment.status = updatedOrder.payment.status;
+        }
       });
   },
 });

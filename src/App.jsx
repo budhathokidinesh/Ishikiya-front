@@ -14,6 +14,7 @@ import FodDetail from "./pages/FodDetail";
 import ProfilePage from "./pages/ProfilePage";
 import SuccessPage from "./pages/SuccessPage";
 import { CancelPage } from "./pages/CancelPage";
+import AdminOrderPage from "./pages/OrderPage";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/order-success" element={<SuccessPage />} />
         <Route path="/cancel" element={<CancelPage />} />
+        <Route path="/admin-order" element={<AdminOrderPage />} />
       </Routes>
 
       <Footer />
