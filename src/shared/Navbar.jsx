@@ -60,12 +60,21 @@ const Navbar = () => {
 
             {/* All links  */}
             <div className="lg:flex hidden gap-8 items-center">
-              <Link
-                to="/menu"
-                className="text-[#191919] text-xl font-medium hover:text-red-500"
-              >
-                Today Special
-              </Link>
+              {user?.role === "user" ? (
+                <Link
+                  to="/orders"
+                  className="text-[#191919] text-xl font-medium hover:text-red-500"
+                >
+                  Orders
+                </Link>
+              ) : (
+                <Link
+                  to="/menu"
+                  className="text-[#191919] text-xl font-medium hover:text-red-500"
+                >
+                  Today Special
+                </Link>
+              )}
 
               {user?.role === "admin" ? (
                 <Link

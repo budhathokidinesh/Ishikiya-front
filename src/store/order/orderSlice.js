@@ -116,7 +116,17 @@ const orderSlice = createSlice({
         state.error = action.payload;
       })
       .addCase(fetchOrderHistory.fulfilled, (state, action) => {
-        state.orders = action.payload;
+        state.isLoading = false;
+        state.orders = action.payload || [];
+        state.error = null;
+      })
+      .addCase(fetchOrderHistory.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchOrderHistory.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
       })
       .addCase(fetchAllOrdersAdmin.fulfilled, (state, action) => {
         state.orders = action.payload;
