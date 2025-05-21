@@ -54,7 +54,7 @@ export const fetchAllOrdersAdmin = createAsyncThunk(
           withCredentials: true,
         }
       );
-      return response.data.orders;
+      return response.data.orders || [];
     } catch (error) {
       return rejectWithValue(
         error.response.data.message || "Failed to fetch all orders."
@@ -90,7 +90,15 @@ const orderSlice = createSlice({
     isLoading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    updateOrderStatus: (state, action) => {
+      const { orderId, status } = action.payload;
+      const order = state.orders.find((order) => order._id === orderId);
+      if (order) {
+        order.payment.status = status;
+      }
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(placeOrder.pending, (state) => {
@@ -112,16 +120,11 @@ const orderSlice = createSlice({
       })
       .addCase(fetchAllOrdersAdmin.fulfilled, (state, action) => {
         state.orders = action.payload;
+        state.isLoading = false;
+        state.orders = action.payload;
       })
       .addCase(changeOrderStatus.fulfilled, (state, action) => {
-        const updatedOrder = action.payload;
-        const index = state.orders.findIndex(
-          (order) => order._id === updatedOrder._id
-        );
-
-        if (index !== -1) {
-          state.orders[index].payment.status = updatedOrder.payment.status;
-        }
+        (state.isLoading = false), (state.error = null);
       });
   },
 });

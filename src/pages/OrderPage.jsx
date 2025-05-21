@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,26 +10,36 @@ import {
 
 const AdminOrderPage = () => {
   const dispatch = useDispatch();
+  const [updatingOrders, setUpdatingOrders] = useState({});
   const { orders, isLoading, error } = useSelector((state) => state.order);
 
   useEffect(() => {
     dispatch(fetchAllOrdersAdmin());
   }, [dispatch]);
 
-  const handleStatusChange = async (orderId, status) => {
+  //this is for updating the order status
+  const handleStatusChange = async (orderId, newStatus) => {
+    setUpdatingOrders((prev) => ({ ...prev, [orderId]: true }));
     try {
-      const result = await dispatch(
-        changeOrderStatus({ orderId, status })
+      // Dispatch an action to update Redux state
+      dispatch({
+        type: "orders/updateOrderStatus",
+        payload: { orderId, status: newStatus },
+      });
+
+      // Make the API call
+      await dispatch(
+        changeOrderStatus({ orderId, status: newStatus })
       ).unwrap();
-      if (result) {
-        // Update the specific order's status directly in state
-        dispatch(fetchAllOrdersAdmin());
-      }
     } catch (error) {
       console.error("Failed to update order status:", error);
+      // Revert the optimistic update if needed
+      dispatch(fetchAllOrdersAdmin());
+    } finally {
+      setUpdatingOrders((prev) => ({ ...prev, [orderId]: false }));
     }
   };
-
+  console.log("ADMIN FETCHED ORDERS:", orders?.length);
   return (
     <div className="pt-[18vh] max-w-4xl mx-auto">
       <h2 className="text-3xl font-bold mb-6">Admin Orders</h2>
@@ -51,7 +61,7 @@ const AdminOrderPage = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {orders.map((order) => (
+                {orders?.map((order) => (
                   <tr key={order._id}>
                     <td className="px-4 py-2">{order._id}</td>
                     <td className="px-4 py-2">{order.buyer?.name || "N/A"}</td>
@@ -66,6 +76,7 @@ const AdminOrderPage = () => {
                           handleStatusChange(order._id, e.target.value)
                         }
                         className="border p-1 rounded"
+                        disabled={updatingOrders[order._id]}
                       >
                         <option value="Pending">Pending</option>
                         <option value="Processing">Processing</option>
