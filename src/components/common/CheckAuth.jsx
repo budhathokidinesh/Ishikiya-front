@@ -3,55 +3,45 @@ import { Navigate, useLocation } from "react-router-dom";
 
 const CheckAuth = ({ isAuthenticated, user, children }) => {
   const location = useLocation();
-  if (location.pathname === "/") {
-    if (!isAuthenticated) {
-      return <Navigate to="/login" />;
-    } else {
-      if (user?.role === "admin") {
-        return <Navigate to="/admin/dashboard" />;
-      } else {
-        return <Navigate to="/shop/home" />;
-      }
-    }
-  }
-  //this is for unahthenticated
+  const path = location.pathname;
 
-  if (
-    !isAuthenticated &&
-    !(
-      location.pathname.includes("/login") ||
-      location.pathname.includes("/register")
-    )
-  ) {
+  //redirect unauthenticated user away from protected pages
+  const isAuthPage = path.includes("/login") || path.includes("/register");
+  if (!isAuthenticated && !isAuthPage) {
     return <Navigate to="/login" />;
   }
-  //this is for authenticated
-  if (
-    isAuthenticated &&
-    (location.pathname.includes("/login") ||
-      location.pathname.includes("/register"))
-  ) {
-    if (user?.role === "admin") {
-      return <Navigate to="/admin/dashboard" />;
-    } else {
-      return <Navigate to="/shop/home" />;
-    }
+
+  //preventing authenticated users from visiting login/register page again
+  if (isAuthenticated && isAuthPage) {
+    return user?.role === "admin" ? (
+      <Navigate to="/admin-order" />
+    ) : (
+      <Navigate to="/menu" />
+    );
   }
 
-  if (
-    isAuthenticated &&
-    user?.role !== "admin" &&
-    location.pathname.includes("admin")
-  ) {
+  //redirecting normal user trying to access admin routes
+  if (isAuthenticated && user?.role !== "admin" && path.startsWith("/admin")) {
     return <Navigate to="/unauth-page" />;
   }
-  if (
-    isAuthenticated &&
-    user?.role === "admin" &&
-    location.pathname.includes("shop")
-  ) {
-    return <Navigate to="/admin/dashboard" />;
+
+  //redirecting admin trying trying to access user routes
+  if (isAuthenticated && user?.role === "admin" && path.startsWith("/shop")) {
+    return <Navigate to="/admin-order" />;
   }
+
+  //homepage behaviour
+
+  if (path === "/") {
+    return !isAuthenticated ? (
+      <Navigate to="/login" />
+    ) : user?.role === "admin" ? (
+      <Navigate to="/admin-order" />
+    ) : (
+      <Navigate to="/menu" />
+    );
+  }
+
   return <>{children}</>;
 };
 

@@ -1,7 +1,13 @@
-import React from "react";
+import { clearCart } from "@/store/cart/cartSlice";
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 
 const SuccessPage = () => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(clearCart());
+  }, []);
   return (
     <div className="pt-[18vh]">
       <div class="bg-gray-100 h-screen">

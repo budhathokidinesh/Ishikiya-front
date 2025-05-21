@@ -40,7 +40,7 @@ const LoginPage = () => {
             toast(data?.payload?.message || "Please verify your account.");
             navigate("/verify-otp");
           } else if (user?.role === "admin") {
-            navigate("/admin/dashboard");
+            navigate("/admin-order");
           } else {
             navigate("/menu");
           }
