@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { isEqual } from "lodash";
 
 // Base URL for API
 const BASE_URL = import.meta.env.VITE_API_URL;
@@ -117,8 +118,10 @@ const orderSlice = createSlice({
       })
       .addCase(fetchOrderHistory.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.orders = action.payload || [];
         state.error = null;
+        if (!isEqual(state.orders, action.payload)) {
+          state.orders = action.payload || [];
+        }
       })
       .addCase(fetchOrderHistory.pending, (state) => {
         state.isLoading = true;

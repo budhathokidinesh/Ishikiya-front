@@ -8,6 +8,9 @@ const UserOrderPage = () => {
   const { orders, isLoading, error } = useSelector((state) => state.order);
 
   useEffect(() => {
+    //this is for initial fetch
+    dispatch(fetchOrderHistory());
+
     const interval = setInterval(() => {
       dispatch(fetchOrderHistory());
     }, 10000);
