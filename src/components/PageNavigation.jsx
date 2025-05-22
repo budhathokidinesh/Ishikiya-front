@@ -1,13 +1,41 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { HiChevronRight } from "react-icons/hi";
 
 const PageNavigation = ({ title }) => {
   return (
-    <div className="text-2xl flex items-center gap-3 font-semibold py-3 mb-3 text-black">
-      <Link to="/">Home /</Link>
-      <Link to="/menu">Menu /</Link>
-      <span className="text-2xl text-yellow-500">{title}</span>
-    </div>
+    <nav
+      className="flex items-center text-sm sm:text-base text-gray-700 mb-6"
+      aria-label="Breadcrumb"
+    >
+      <ol className="inline-flex items-center space-x-1 sm:space-x-3">
+        <li className="inline-flex items-center">
+          <Link
+            to="/"
+            className="inline-flex items-center text-blue-600 hover:underline font-medium"
+          >
+            Home
+          </Link>
+        </li>
+        <li>
+          <div className="flex items-center">
+            <HiChevronRight className="text-gray-400" />
+            <Link
+              to="/menu"
+              className="ml-1 text-blue-600 hover:underline font-medium"
+            >
+              Menu
+            </Link>
+          </div>
+        </li>
+        <li>
+          <div className="flex items-center">
+            <HiChevronRight className="text-gray-400" />
+            <span className="ml-1 font-semibold text-yellow-500">{title}</span>
+          </div>
+        </li>
+      </ol>
+    </nav>
   );
 };
 

@@ -75,6 +75,22 @@ export const deleteFood = createAsyncThunk(
     }
   }
 );
+//this is for food
+export const addReview = createAsyncThunk(
+  "food/addReview",
+  async ({ foodId, reviewData }, { rejectWithValue }) => {
+    try {
+      const result = await axios.post(
+        `${BASE_URL}/api/v1/food/${foodId}/reviews`,
+        reviewData,
+        { withCredentials: true }
+      );
+      return result?.data; // Expect the updated food or review info from backend
+    } catch (error) {
+      return rejectWithValue(error?.response?.data);
+    }
+  }
+);
 const AdminProductsSlice = createSlice({
   name: "adminFood",
   initialState,
@@ -91,6 +107,32 @@ const AdminProductsSlice = createSlice({
       })
       .addCase(fetchAllFoods.rejected, (state) => {
         (state.isLoading = false), (state.foodList = []);
+      })
+      .addCase(addReview.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(addReview.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // Option 1: Update the specific food's reviews if returned
+        // Assuming action.payload has updated food object or review list
+        const updatedFood = action.payload.food || action.payload;
+        if (updatedFood) {
+          const index = state.foodList.findIndex(
+            (f) => f._id === updatedFood._id
+          );
+          if (index !== -1) {
+            state.foodList[index] = updatedFood;
+          }
+        }
+        // Option 2: Or just push new review somewhere if your state has a place for it
+
+        // Clear error on success
+        state.error = null;
+      })
+      .addCase(addReview.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload?.message || "Failed to add review";
       });
   },
 });

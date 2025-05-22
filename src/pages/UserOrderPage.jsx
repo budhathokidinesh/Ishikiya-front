@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrderHistory } from "@/store/order/orderSlice";
 import { Link } from "react-router-dom";
+import ReviewForm from "@/components/ReviewForm";
 
 const UserOrderPage = () => {
   const dispatch = useDispatch();
@@ -10,12 +11,11 @@ const UserOrderPage = () => {
   useEffect(() => {
     //this is for initial fetch
     dispatch(fetchOrderHistory());
-
-    const interval = setInterval(() => {
-      dispatch(fetchOrderHistory());
-    }, 10000);
-    return () => clearInterval(interval);
   }, [dispatch]);
+
+  const handleRefresh = () => {
+    dispatch(fetchOrderHistory());
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -68,10 +68,16 @@ const UserOrderPage = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 pt-[18vh]">
       <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="px-6 py-5 border-b border-gray-200">
+        <div className="px-6 py-5 border-b border-gray-200 flex justify-between items-center">
           <h2 className="text-2xl font-semibold text-gray-800">
             My Order History
           </h2>
+          <button
+            onClick={handleRefresh}
+            className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-md cursor-pointer"
+          >
+            Refresh
+          </button>
         </div>
 
         {orders?.length === 0 ? (
@@ -157,6 +163,7 @@ const UserOrderPage = () => {
                           <p className="text-sm text-gray-500">
                             Qty: {item.quantity}
                           </p>
+                          <ReviewForm foodId={item.food?._id} />
                         </div>
                       </div>
                     ))}
