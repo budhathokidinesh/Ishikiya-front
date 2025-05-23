@@ -1,9 +1,21 @@
 import Navbar from "@/shared/Navbar";
-import React from "react";
+import React, { useRef } from "react";
 import { FaSearch } from "react-icons/fa";
 import { FaArrowAltCircleRight } from "react-icons/fa";
 
 const Header = () => {
+  const carouselRef = useRef(null);
+
+  const scrollToSlide = (slideIndex) => {
+    const slide = document.getElementById(`slide${slideIndex}`);
+    if (slide) {
+      slide.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
+    }
+  };
   return (
     <div className="py-3 px-10 sm:px-4 md:px-6 lg:px-6">
       <div className="container w-full py-[15vh]">
@@ -11,15 +23,14 @@ const Header = () => {
           <div className="lg:w-[32rem] w-full flex flex-col space-y-6">
             {/* Title  */}
             <div className="text-4xl md:text-5xl font-bold text-[#2e2e2e] lg:text-6xl text-center">
-              We are <span className="text-red-500">Serious</span> for{" "}
-              <span className="text-red-500">Food.</span>
+              Crispy <span className="text-amber-500">Golden</span> Fish &{" "}
+              <span className="text-amber-500">Chips</span>
             </div>
-            {/* Desciption  */}
+            {/* Description  */}
             <div className="lg:text-xl text-black md:text-lg text-center">
-              Lorem ipsum dolor sit, amet consectetur adipisicing elit.
-              Cupiditate nulla doloremque possimus nam vitae facilis autem
-              veniam expedita sed, et at dolor distinctio corrupti animi
-              voluptate hic, officia dolorem beatae.
+              Serving the crispiest, freshest fish with golden chips since
+              [year]. Our secret-battered cod and hand-cut potatoes are cooked
+              to perfection - just like the classic British tradition!
             </div>
             {/* search foods  */}
             <div className="flex rounded-full py-2 px-4 justify-between items-center bg-white shadow-md">
@@ -27,7 +38,7 @@ const Header = () => {
                 <FaSearch size={22} className="cursor-pointer" />
                 <input
                   type="text"
-                  placeholder="Search foods here...."
+                  placeholder="Search our menu..."
                   className="text-black w-full border-none outline-none py-2 px-4"
                 />
               </div>
@@ -38,72 +49,139 @@ const Header = () => {
                 />
               </div>
             </div>
-            {/* Explore button  */}
+            {/* Order button  */}
             <div className="flex gap-8 items-center justify-center">
-              <button className="bg-red-400 active:scale-90 transition duration-500 transform hover:shadow-xl shadow-md rounded-full px-8 py-2 text-xl font-medium text-white cursor-pointer flex gap-2">
-                Explore Now
+              <button className="bg-amber-400 active:scale-90 transition duration-500 transform hover:shadow-xl shadow-md rounded-full px-8 py-2 text-xl font-medium text-white cursor-pointer flex gap-2">
+                Order Now
                 <FaArrowAltCircleRight />
               </button>
             </div>
           </div>
-          <div className="carousel w-full">
-            <div
-              id="slide1"
-              className="carousel-item relative w-full rounded-2xl"
-            >
+          {/* This is for carasoul  */}
+          <div
+            ref={carouselRef}
+            className="carousel w-full rounded-2xl overflow-hidden shadow-xl"
+          >
+            {/* Slide 1 - Hero Image */}
+            <div id="slide1" className="carousel-item relative w-full">
               <img
                 src="./fnc.jpg"
-                className="h-[28rem] mx-auto justify-end rounded-xl"
+                className="w-full h-[28rem] object-cover"
+                alt="Golden fish and chips with lemon wedges"
               />
-              <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-                <a href="#slide4" className="btn btn-circle">
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+                <h3 className="text-3xl font-bold text-white">
+                  Our Signature Dish
+                </h3>
+                <p className="text-white">
+                  Crispy beer-battered cod with hand-cut chips
+                </p>
+              </div>
+              <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
+                <button
+                  onClick={() => scrollToSlide(4)}
+                  className="btn btn-circle bg-white/30 hover:bg-white/50 border-none text-white"
+                >
                   ❮
-                </a>
-                <a href="#slide2" className="btn btn-circle">
+                </button>
+                <button
+                  onClick={() => scrollToSlide(2)}
+                  className="btn btn-circle bg-white/30 hover:bg-white/50 border-none text-white"
+                >
                   ❯
-                </a>
+                </button>
               </div>
             </div>
+
+            {/* Slide 2 - Meal Deal */}
             <div id="slide2" className="carousel-item relative w-full">
               <img
                 src="./bnc2.jpg"
-                className="h-[28rem] mx-auto justify-end rounded-xl"
+                className="w-full h-[28rem] object-cover"
+                alt="Family meal deal with fish, chips, and sides"
               />
-              <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-                <a href="#slide1" className="btn btn-circle">
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+                <h3 className="text-3xl font-bold text-white">Family Feast</h3>
+                <p className="text-white">
+                  Perfect for sharing - save 15% on family bundles
+                </p>
+              </div>
+              <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
+                <button
+                  onClick={() => scrollToSlide(1)}
+                  className="btn btn-circle bg-white/30 hover:bg-white/50 border-none text-white"
+                >
                   ❮
-                </a>
-                <a href="#slide3" className="btn btn-circle">
+                </button>
+                <button
+                  onClick={() => scrollToSlide(3)}
+                  className="btn btn-circle bg-white/30 hover:bg-white/50 border-none text-white"
+                >
                   ❯
-                </a>
+                </button>
               </div>
             </div>
+
+            {/* Slide 3 - Special Offer */}
             <div id="slide3" className="carousel-item relative w-full">
               <img
                 src="bnc3.jpg"
-                className="h-[28rem] mx-auto justify-end rounded-xl"
+                className="w-full h-[28rem] object-cover"
+                alt="Special seafood platter"
               />
-              <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-                <a href="#slide2" className="btn btn-circle">
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+                <h3 className="text-3xl font-bold text-white">
+                  Today's Special
+                </h3>
+                <p className="text-white">
+                  Try our seafood platter - only £12.99 today!
+                </p>
+                <button className="mt-2 btn btn-sm bg-amber-400 border-none hover:bg-amber-500">
+                  Order Now
+                </button>
+              </div>
+              <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
+                <button
+                  onClick={() => scrollToSlide(2)}
+                  className="btn btn-circle bg-white/30 hover:bg-white/50 border-none text-white"
+                >
                   ❮
-                </a>
-                <a href="#slide4" className="btn btn-circle">
+                </button>
+                <button
+                  onClick={() => scrollToSlide(4)}
+                  className="btn btn-circle bg-white/30 hover:bg-white/50 border-none text-white"
+                >
                   ❯
-                </a>
+                </button>
               </div>
             </div>
+
+            {/* Slide 4 - Fresh Ingredients */}
             <div id="slide4" className="carousel-item relative w-full">
               <img
                 src="bnc4.jpg"
-                className="h-[28rem] mx-auto justify-end rounded-xl"
+                className="w-full h-[28rem] object-cover"
+                alt="Fresh ingredients preparation"
               />
-              <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-                <a href="#slide3" className="btn btn-circle">
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+                <h3 className="text-3xl font-bold text-white">Fresh Daily</h3>
+                <p className="text-white">
+                  Locally-sourced fish and potatoes, prepared fresh each morning
+                </p>
+              </div>
+              <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
+                <button
+                  onClick={() => scrollToSlide(3)}
+                  className="btn btn-circle bg-white/30 hover:bg-white/50 border-none text-white"
+                >
                   ❮
-                </a>
-                <a href="#slide1" className="btn btn-circle">
+                </button>
+                <button
+                  onClick={() => scrollToSlide(1)}
+                  className="btn btn-circle bg-white/30 hover:bg-white/50 border-none text-white"
+                >
                   ❯
-                </a>
+                </button>
               </div>
             </div>
           </div>
