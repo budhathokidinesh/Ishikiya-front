@@ -2,40 +2,43 @@ import React from "react";
 import { FaFacebookF } from "react-icons/fa";
 import { FaInstagram } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+
 const Footer = () => {
   return (
-    <footer className="footer footer-horizontal bg-red-200 text-base-content rounded p-10 footer-center">
-      <nav className="grid grid-flow-col gap-4 text-xl font-bold ">
-        <a href="" className="hover:text-red-400 ">
-          About Us
-        </a>
-        <a href="" className="hover:text-red-400 ">
-          Contact Us
-        </a>
-        <a href="" className="hover:text-red-400 ">
-          Our Menu
-        </a>
-      </nav>
-      <nav>
-        <div className="grid grid-flow-col gap-8 text-2xl">
-          <a href="https://www.facebook.com/ALKIMOSBEACHFISHCHIPS">
-            <FaFacebookF className="hover:text-blue-400 " />
+    <footer className="w-screen bg-gradient-to-r from-[#142850] to-[#27496d] text-white py-10">
+      <div className=" px-4 text-center space-y-6 w-full">
+        <nav className="flex flex-wrap justify-center gap-6 text-lg font-semibold">
+          <a href="#" className="hover:text-yellow-400 transition">
+            About Us
           </a>
+          <a href="#" className="hover:text-yellow-400 transition">
+            Contact Us
+          </a>
+          <a href="#" className="hover:text-yellow-400 transition">
+            Our Menu
+          </a>
+        </nav>
 
-          <a href="">
-            <FaInstagram className="hover:text-blue-400 " />
+        <div className="flex justify-center space-x-6 text-2xl">
+          <a
+            href="https://www.facebook.com/ALKIMOSBEACHFISHCHIPS"
+            className="hover:text-blue-400"
+          >
+            <FaFacebookF />
           </a>
-          <a href="">
-            <FaXTwitter className="hover:text-blue-400 " />
+          <a href="#" className="hover:text-pink-400">
+            <FaInstagram />
+          </a>
+          <a href="#" className="hover:text-blue-300">
+            <FaXTwitter />
           </a>
         </div>
-      </nav>
-      <aside>
-        <p>
-          Copyright © {new Date().getFullYear()} - All right reserved by Alkimos
-          Beach Fish and Chips.
-        </p>
-      </aside>
+
+        <aside className="text-sm text-gray-300">
+          © {new Date().getFullYear()} Alkimos Beach Fish and Chips. All rights
+          reserved.
+        </aside>
+      </div>
     </footer>
   );
 };

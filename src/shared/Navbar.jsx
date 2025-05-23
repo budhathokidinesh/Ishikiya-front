@@ -51,7 +51,7 @@ const Navbar = () => {
   console.log(user);
   return (
     <>
-      <div className="bg-white/80 shadow-md fixed top-0 left-0 w-full z-40 ease-in duration-300 backdrop-blur-md">
+      <div className="bg-[#142850] text-white shadow-md fixed top-0 left-0 w-full z-40 ease-in duration-300 backdrop-blur-md">
         <div className="py-3 px-10 sm:px-4 md:px-6 lg:px-6 container mx-auto">
           <div className="flex items-center justify-between ">
             <Link to="/">
@@ -63,14 +63,14 @@ const Navbar = () => {
               {user?.role === "user" ? (
                 <Link
                   to="/orders"
-                  className="text-[#191919] text-xl font-medium hover:text-red-500"
+                  className=" text-xl font-medium hover:text-red-500"
                 >
                   Orders
                 </Link>
               ) : (
                 <Link
                   to="/menu"
-                  className="text-[#191919] text-xl font-medium hover:text-red-500"
+                  className=" text-xl font-medium hover:text-red-500"
                 >
                   Today Special
                 </Link>
@@ -79,14 +79,14 @@ const Navbar = () => {
               {user?.role === "admin" ? (
                 <Link
                   to="/admin-order"
-                  className="text-[#191919] text-xl font-medium hover:text-red-500"
+                  className=" text-xl font-medium hover:text-red-500"
                 >
                   Orders
                 </Link>
               ) : (
                 <Link
                   to="/aboutus"
-                  className="text-[#191919] text-xl font-medium hover:text-red-500"
+                  className=" text-xl font-medium hover:text-red-500"
                 >
                   About Us
                 </Link>
@@ -94,7 +94,7 @@ const Navbar = () => {
 
               <Link
                 to="/menu"
-                className="text-[#191919] text-xl font-medium hover:text-red-500"
+                className=" text-xl font-medium hover:text-red-500"
               >
                 Our Menu
               </Link>
@@ -102,7 +102,7 @@ const Navbar = () => {
               {user?.role === "admin" && (
                 <Link
                   to="/addfood"
-                  className="text-[#191919] text-xl font-medium hover:text-red-500"
+                  className=" text-xl font-medium hover:text-red-500"
                 >
                   Add Menu
                 </Link>
@@ -138,7 +138,7 @@ const Navbar = () => {
                   </div>
                   <div
                     tabIndex={0}
-                    className="card card-compact dropdown-content bg-red-100 z-1 mt-3 w-52 shadow"
+                    className="card card-compact dropdown-content bg-[#142850] z-1 mt-3 w-52 shadow"
                   >
                     <div className="card-body">
                       <span className="text-lg font-bold">
@@ -179,7 +179,7 @@ const Navbar = () => {
                   </div>
                   <ul
                     tabIndex={0}
-                    className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
+                    className="menu menu-sm dropdown-content bg-[#142850] rounded-box z-1 mt-3 w-52 p-2 shadow"
                   >
                     <Link to="/profile">Profile</Link>
 
@@ -190,7 +190,7 @@ const Navbar = () => {
                 </div>
               ) : (
                 <Link to="/login">
-                  <button className="bg-[#F54748] active:scale-90 transition duration-100 transform hover:shadow-xl shadow-md rounded-full px-8 py-2 text-xl font-medium text-white cursor-pointer">
+                  <button className="backdrop-blur-md bg-white/20 border border-white/30 text-white font-medium px-6 py-2 rounded-full shadow-md hover:bg-white/30 hover:shadow-lg transition duration-200 cursor-pointer">
                     Login
                   </button>
                 </Link>
@@ -204,7 +204,7 @@ const Navbar = () => {
               ) : (
                 <GiHamburgerMenu
                   size={25}
-                  className="text-[#191919] cursor-pointer"
+                  className="text-white cursor-pointer"
                 />
               )}
             </div>
