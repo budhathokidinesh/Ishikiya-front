@@ -103,14 +103,7 @@ function App() {
           }
         />
         {/* This is common  */}
-        <Route
-          path="/menu"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <MenuPage />
-            </CheckAuth>
-          }
-        />
+        <Route path="/menu" element={<MenuPage />} />
       </Routes>
 
       <Footer />
