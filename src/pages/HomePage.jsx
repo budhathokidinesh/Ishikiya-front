@@ -8,7 +8,11 @@ const HomePage = () => {
   return (
     <div>
       <Header />
+      <br />
+      <br />
+      <div className="border-t border-yellow-400 mx-auto w-3/4" />
       <RecommendedFood />
+      <div className="border-t border-yellow-400 mx-auto w-3/4" />
       <Special />
     </div>
   );

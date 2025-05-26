@@ -39,7 +39,9 @@ export const getFood = createAsyncThunk(
   "food/getFood",
   async (id, { rejectWithValue }) => {
     try {
-      const result = await axios.get(`${BASE_URL}/api/v1/food/getFood/${id}`);
+      const result = await axios.get(`${BASE_URL}/api/v1/food/getFood/${id}`, {
+        withCredentials: true,
+      });
       return result?.data;
     } catch (error) {
       return rejectWithValue(error?.response?.data);
@@ -53,7 +55,8 @@ export const editFood = createAsyncThunk(
     try {
       const result = await axios.put(
         `${BASE_URL}/api/v1/food/updateFood/${id}`,
-        formData
+        formData,
+        { withCredentials: true }
       );
       return result?.data;
     } catch (error) {

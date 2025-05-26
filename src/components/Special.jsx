@@ -3,7 +3,7 @@ import React from "react";
 const Special = () => {
   return (
     <div className="py-3 px-10 sm:px-4 md:px-6 lg:px-6">
-      <div className="container w-full py-[2vh]">
+      <div className="container mx-auto py-[2vh]">
         {/* Title for top seller  */}
         <div className="text-2xl md:text-3xl font-bold text-center text-[#2e2e2e] lg:text-4xl">
           Today <span className="text-red-400">Special</span>
@@ -28,7 +28,12 @@ const Special = () => {
               </p>
               <div className="card-actions justify-between mt-2">
                 <span className="text-xl font-semibold">Price: $20</span>
-                <button className="btn btn-sm btn-primary">Order Now</button>
+                <button
+                  className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-2 text-sm rounded shadow transition-all duration-200 cursor-pointer"
+                  onClick={() => handleAddToCart(item)}
+                >
+                  Order Now
+                </button>
               </div>
             </div>
           </div>
@@ -52,7 +57,12 @@ const Special = () => {
               </p>
               <div className="card-actions justify-between mt-2">
                 <span className="text-xl font-semibold">Price: $20</span>
-                <button className="btn btn-sm btn-primary">Order Now</button>
+                <button
+                  className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-2 text-sm rounded shadow transition-all duration-200 cursor-pointer"
+                  onClick={() => handleAddToCart(item)}
+                >
+                  Order Now
+                </button>
               </div>
             </div>
           </div>
@@ -73,7 +83,12 @@ const Special = () => {
               </p>
               <div className="card-actions justify-between mt-2">
                 <span className="text-xl font-semibold">Price: $20</span>
-                <button className="btn btn-sm btn-primary">Order Now</button>
+                <button
+                  className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-2 text-sm rounded shadow transition-all duration-200 cursor-pointer"
+                  onClick={() => handleAddToCart(item)}
+                >
+                  Order Now
+                </button>
               </div>
             </div>
           </div>
@@ -94,7 +109,12 @@ const Special = () => {
               </p>
               <div className="card-actions justify-between mt-2">
                 <span className="text-xl font-semibold">Price: $6</span>
-                <button className="btn btn-sm btn-primary">Order Now</button>
+                <button
+                  className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-2 text-sm rounded shadow transition-all duration-200 cursor-pointer"
+                  onClick={() => handleAddToCart(item)}
+                >
+                  Order Now
+                </button>
               </div>
             </div>
           </div>

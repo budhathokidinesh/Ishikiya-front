@@ -9,6 +9,7 @@ const MenuPage = () => {
   const dispatch = useDispatch();
   const { foodList, isLoading } = useSelector((state) => state.food);
   const [active, setActive] = useState(0);
+  const { user } = useSelector((state) => state.auth);
   const [value, setValue] = useState({
     id: 0,
     name: "All",
@@ -63,34 +64,33 @@ const MenuPage = () => {
     dispatch(fetchCart());
   };
   return (
-    <div className="pt-[16vh] px-10 sm:px-4 md:px-6">
-      <div className="container w-full py-8">
+    <div className="pt-[12vh] px-8 sm:px-4 md:px-6">
+      <div className="container mx-auto py-8">
         <div className="p-5 mb-14">
           <div className="flex flex-wrap justify-center mb-8 gap-4">
             {category?.map((btn) => (
               <button
-                className={
+                className={`text-xl px-6 py-3 font-semibold transition-all duration-200 border-2 shadow-sm rounded-md cursor-pointer ${
                   active === btn.id
-                    ? "text-xl px-4 py-3 text-center text-white bg-red-500 border-red-500 border-2 rounded-sm justify-center font-medium cursor-pointer"
-                    : "text-xl px-4 py-3 text-red-500 border-red-500 border-2 rounded-sm cursor-pointer font-medium"
-                }
-                onClick={() => {
-                  handleBtn(btn);
-                }}
+                    ? "bg-yellow-400 text-white border-yellow-400 hover:bg-yellow-500"
+                    : "bg-white text-yellow-500 border-yellow-400 hover:bg-yellow-100"
+                }`}
+                onClick={() => handleBtn(btn)}
               >
                 {btn.name}
               </button>
+
               //this is for fetching all foods
             ))}
           </div>
           {isLoading ? (
             <p className="text-center text-xl">Loading food items</p>
           ) : (
-            <div className="grid py-6 lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 grid-cols-1 gap-4 items-center justify-items-center">
+            <div className="grid py-4 lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 grid-cols-1 gap-4 items-center justify-items-center">
               {filteredFoodList?.map((item) => (
                 <div
                   key={item._id}
-                  className="bg-base-100 w-70 shadow-sm h-[480px] flex flex-col transform transition duration-300 hover:scale-105 hover:cursor-pointer p-0 rounded-md"
+                  className="bg-base-100 w-90 md:w-80 lg:w-70 shadow-sm h-[480px] flex flex-col transform transition duration-300 hover:scale-105 hover:cursor-pointer p-0 rounded-md"
                 >
                   <figure className="h-52 w-full overflow-hidden m-0">
                     <Link to={`/fooddetail/${item._id}`}>
@@ -101,7 +101,7 @@ const MenuPage = () => {
                     </Link>
                   </figure>
 
-                  <div className="flex text-sm space-x-2 cursor-pointer px-4 pt-2">
+                  {/* <div className="flex text-sm space-x-2 cursor-pointer px-4 pt-2">
                     <span className="font-normal text-orange-500">
                       {item.reviews.length > 0
                         ? (
@@ -112,7 +112,7 @@ const MenuPage = () => {
                     </span>
                     <CiStar size={16} className="text-orange-300" />
                     <span className="font-medium">{item?.reviews?.length}</span>
-                  </div>
+                  </div> */}
 
                   <div className="flex flex-col flex-grow px-4 py-2 overflow-hidden h-[160px]">
                     <h2 className="card-title text-lg text-center items-center text-blue-600">
@@ -152,12 +152,14 @@ const MenuPage = () => {
                     <span className="text-xl font-semibold">
                       Price: ${item.price}
                     </span>
-                    <button
-                      className="btn btn-sm btn-primary"
-                      onClick={() => handleAddToCart(item)}
-                    >
-                      Order Now
-                    </button>
+                    {user?.role === "admin" ? null : (
+                      <button
+                        className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-2 text-sm rounded shadow transition-all duration-200 cursor-pointer"
+                        onClick={() => handleAddToCart(item)}
+                      >
+                        Order Now
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}

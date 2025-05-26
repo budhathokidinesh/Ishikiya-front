@@ -44,7 +44,7 @@ const Header = () => {
   return (
     <div className="py-3 px-10 sm:px-4 md:px-6 lg:px-6">
       {/* Opening Hours Banner - Added at the top */}
-      <div className="relative -mx-6 mb-10 mt-[10vh]">
+      <div className="relative -mx-6 mb-12 mt-[10vh] ">
         <div className="bg-amber-500 text-white py-3 px-6 shadow-lg">
           <div className="container mx-auto flex flex-wrap justify-between items-center">
             <div className="flex items-center space-x-4">
@@ -73,7 +73,7 @@ const Header = () => {
         </div>
       </div>
       {/* This is main Header  */}
-      <div className="container w-full">
+      <div className="container mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 relative lg:grid-cols-2 gap-10">
           <div className="lg:w-[32rem] w-full flex flex-col space-y-6">
             {/* Title with decorative elements */}
