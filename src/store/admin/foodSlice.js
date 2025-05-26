@@ -67,7 +67,8 @@ export const deleteFood = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const result = await axios.delete(
-        `${BASE_URL}/api/v1/food/deleteFood/${id}`
+        `${BASE_URL}/api/v1/food/deleteFood/${id}`,
+        { withCredentials: true }
       );
       return result?.data;
     } catch (error) {

@@ -86,7 +86,7 @@ const MenuPage = () => {
           {isLoading ? (
             <p className="text-center text-xl">Loading food items</p>
           ) : (
-            <div className="grid py-6 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4 items-center justify-items-center">
+            <div className="grid py-6 lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 grid-cols-1 gap-4 items-center justify-items-center">
               {filteredFoodList?.map((item) => (
                 <div
                   key={item._id}

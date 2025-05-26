@@ -1,9 +1,9 @@
 import PageNavigation from "@/components/PageNavigation";
-import { getFood } from "@/store/admin/foodSlice";
+import { deleteFood, fetchAllFoods, getFood } from "@/store/admin/foodSlice";
 import { addToCart, fetchCart } from "@/store/cart/cartSlice";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { AiOutlineMinus } from "react-icons/ai";
 import { HiOutlinePlus } from "react-icons/hi";
 import { CiStar } from "react-icons/ci";
@@ -14,6 +14,7 @@ const FoodDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const dispatch = useDispatch();
   const { id } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (id) {
@@ -24,6 +25,7 @@ const FoodDetail = () => {
     }
   }, [dispatch, id]);
 
+  //This is for handle on ad cart
   const handleAddToCart = () => {
     const item = {
       foodId: foodDetails._id,
@@ -33,6 +35,7 @@ const FoodDetail = () => {
     dispatch(fetchCart());
   };
 
+  //This is for handle on quantity change
   const handleQuantityChange = (type) => {
     setQuantity((prev) => {
       if (type === "inc") return prev + 1;
@@ -40,6 +43,7 @@ const FoodDetail = () => {
     });
   };
 
+  //This is for loading food details
   if (!foodDetails) {
     return (
       <div className="pt-[16vh] px-10 sm:px-4 md:px-6">
@@ -50,6 +54,25 @@ const FoodDetail = () => {
     );
   }
 
+  //THis is for handle on delete
+  const handleOnDelete = () => {
+    const confirmDelete = window.confirm(
+      "Are yu sure to delete this food item?"
+    );
+    if (!confirmDelete) return;
+
+    dispatch(deleteFood(foodDetails._id))
+      .unwrap()
+      .then(() => {
+        alert("Food item deleted successfully.");
+        dispatch(fetchAllFoods());
+        navigate("/menu");
+      })
+      .catch((err) => {
+        console.log("Failed to delete food:", err);
+        alert("Failed to delete. Try again");
+      });
+  };
   return (
     <div className="pt-[16vh] px-10 sm:px-4 md:px-6">
       <div className="container w-full py-8">
@@ -79,30 +102,36 @@ const FoodDetail = () => {
             <p className="text-gray-700 mb-4">{foodDetails.description}</p>
 
             {/* Quantity Control */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="text-xl font-semibold text-red-500">Quantity</div>
-              <div className="flex items-center space-x-4">
-                <button
-                  className="bg-red-500 text-white p-3 rounded-full"
-                  onClick={() => handleQuantityChange("dec")}
-                >
-                  <AiOutlineMinus />
-                </button>
-                <span className="text-lg font-medium px-4">{quantity}</span>
-                <button
-                  className="bg-red-500 text-white p-3 rounded-full"
-                  onClick={() => handleQuantityChange("inc")}
-                >
-                  <HiOutlinePlus />
-                </button>
+            {user?.role === "user" ? (
+              <div className="flex items-center justify-between mb-6">
+                <div className="text-xl font-semibold text-red-500">
+                  Quantity
+                </div>
+                <div className="flex items-center space-x-4">
+                  <button
+                    className="bg-red-500 text-white p-3 rounded-full"
+                    onClick={() => handleQuantityChange("dec")}
+                  >
+                    <AiOutlineMinus />
+                  </button>
+                  <span className="text-lg font-medium px-4">{quantity}</span>
+                  <button
+                    className="bg-red-500 text-white p-3 rounded-full"
+                    onClick={() => handleQuantityChange("inc")}
+                  >
+                    <HiOutlinePlus />
+                  </button>
+                </div>
               </div>
-            </div>
+            ) : null}
 
             {/* Admin Edit/Delete OR Order */}
             {user?.role === "admin" ? (
               <div className="flex gap-4">
                 <button className="btn btn-primary">Edit</button>
-                <button className="btn btn-secondary">Delete</button>
+                <button onClick={handleOnDelete} className="btn btn-secondary">
+                  Delete
+                </button>
               </div>
             ) : (
               <button

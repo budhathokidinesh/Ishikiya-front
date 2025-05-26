@@ -60,6 +60,9 @@ const Navbar = () => {
 
             {/* All links  */}
             <div className="lg:flex hidden gap-8 items-center">
+              <Link to="/" className=" text-xl font-medium hover:text-red-500">
+                Home
+              </Link>
               {user?.role === "user" ? (
                 <Link
                   to="/orders"
@@ -108,7 +111,7 @@ const Navbar = () => {
                 </Link>
               )}
               {/* this is for cart item */}
-              {user?.role === "user" ? (
+              {user?.role === "admin" ? null : (
                 <div className="dropdown dropdown-end">
                   <div
                     tabIndex={0}
@@ -161,7 +164,7 @@ const Navbar = () => {
                     </div>
                   </div>
                 </div>
-              ) : null}
+              )}
 
               {user ? (
                 <div className="dropdown dropdown-end">
