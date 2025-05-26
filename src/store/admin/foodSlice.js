@@ -56,7 +56,12 @@ export const editFood = createAsyncThunk(
       const result = await axios.put(
         `${BASE_URL}/api/v1/food/updateFood/${id}`,
         formData,
-        { withCredentials: true }
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
       );
       return result?.data;
     } catch (error) {
