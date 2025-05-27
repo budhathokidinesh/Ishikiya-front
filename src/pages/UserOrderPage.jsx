@@ -4,6 +4,9 @@ import { fetchOrderHistory } from "@/store/order/orderSlice";
 import { Link } from "react-router-dom";
 import ReviewForm from "@/components/ReviewForm";
 
+import GenerateReceiptPDF from "@/utils/GenerateReceiptPDF";
+import Receipt from "@/components/Receipt";
+
 const UserOrderPage = () => {
   const dispatch = useDispatch();
   const { orders, isLoading, error } = useSelector((state) => state.order);
@@ -16,20 +19,36 @@ const UserOrderPage = () => {
   const handleRefresh = () => {
     dispatch(fetchOrderHistory());
   };
+  console.log(orders, "Orders");
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "Delivered":
+      case "Paid":
         return "bg-green-100 text-green-800";
-      case "Shipped":
-        return "bg-blue-100 text-blue-800";
-      case "Processing":
-        return "bg-yellow-100 text-yellow-800";
       case "Pending":
         return "bg-orange-100 text-orange-800";
+      case "Processing":
+        return "bg-yellow-100 text-yellow-800";
+      case "Failed":
+        return "bg-red-100 text-red-800";
+      case "Refunded":
+        return "bg-gray-100 text-gray-700";
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+  //this is for generating the receipt
+  const handleDownloadReceipt = (order) => {
+    const TestReceipt = () => (
+      <div style={{ background: "#fff", color: "#000", padding: "40px" }}>
+        <h1>Test Receipt</h1>
+        <p>Order ID: {order._id}</p>
+        <p>Total: ${order.totalAmount}</p>
+      </div>
+    );
+    GenerateReceiptPDF(order, TestReceipt).catch((err) => {
+      console.error("Error generating PDF:", err);
+    });
   };
 
   if (isLoading) {
@@ -108,11 +127,12 @@ const UserOrderPage = () => {
           </div>
         ) : (
           <div className="divide-y divide-gray-200">
-            {orders?.map((order) => (
-              <div key={order._id} className="px-6 py-5">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex-shrink-0">
+            {[...orders]
+              ?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sort most recent first
+              .map((order) => (
+                <div key={order._id} className="px-6 py-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center space-x-4">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
                           order.payment.status
@@ -120,66 +140,84 @@ const UserOrderPage = () => {
                       >
                         {order.payment.status}
                       </span>
+                      <span
+                        className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-800 font-medium"
+                        title="Order Status"
+                      >
+                        {order.orderStatus}
+                      </span>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-900">
                         Order #{order._id.slice(-6).toUpperCase()}
                       </p>
                       <p className="text-sm text-gray-500">
+                        Ordered on:{" "}
                         {new Date(order.createdAt).toLocaleDateString()}
                       </p>
                     </div>
+                    <div className="mt-3 sm:mt-0">
+                      <p className="text-lg font-semibold text-gray-900">
+                        ${order.totalAmount.toFixed(2)}
+                      </p>
+                      <button
+                        onClick={() => handleDownloadReceipt(order)}
+                        className="bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-1 rounded-md"
+                      >
+                        Download Receipt
+                      </button>
+                    </div>
                   </div>
-                  <div className="mt-3 sm:mt-0">
-                    <p className="text-lg font-semibold text-gray-900">
-                      ${order.totalAmount.toFixed(2)}
+
+                  <div className="mt-4">
+                    <p className="text-sm text-gray-500 mb-2">
+                      Payment: {order.payment.method}{" "}
+                      {order.payment.transitionId && (
+                        <>
+                          | Transaction ID:{" "}
+                          <span className="text-gray-700 font-mono">
+                            {order.payment.transitionId}
+                          </span>
+                        </>
+                      )}
                     </p>
-                  </div>
-                </div>
-
-                <div className="mt-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">
-                    Items:
-                  </h4>
-                  <div className="space-y-3">
-                    {order.items.map((item, index) => (
-                      <div key={index} className="flex items-start">
-                        {item.food?.imageUrl && (
-                          <img
-                            className="h-16 w-16 rounded-md object-cover"
-                            src={item.food.imageUrl}
-                            alt={item.food.title}
-                          />
-                        )}
-                        <div className="ml-4 flex-1">
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium text-gray-900">
-                              {item.food?.title || "Unknown Item"}
+                    <h4 className="text-sm font-medium text-gray-900 mb-2">
+                      Items:
+                    </h4>
+                    <div className="space-y-3">
+                      {order.items.map((item, index) => (
+                        <div key={index} className="flex items-start">
+                          {item.food?.imageUrl ? (
+                            <img
+                              className="h-16 w-16 rounded-md object-cover"
+                              src={item.food.imageUrl}
+                              alt={item.food.title || "Food item"}
+                            />
+                          ) : (
+                            <div className="h-16 w-16 rounded-md bg-gray-100 flex items-center justify-center text-gray-400 text-xs">
+                              No image
+                            </div>
+                          )}
+                          <div className="ml-4 flex-1">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm font-medium text-gray-900">
+                                {item.food?.title || "Unknown Item"}
+                              </p>
+                              <p className="text-sm text-gray-500 ml-2">
+                                ${item.price.toFixed(2)}
+                              </p>
+                            </div>
+                            <p className="text-sm text-gray-500">
+                              Qty: {item.quantity}
                             </p>
-                            <p className="text-sm text-gray-500 ml-2">
-                              ${item.price.toFixed(2)}
-                            </p>
+                            <ReviewForm foodId={item.food?._id} />
                           </div>
-                          <p className="text-sm text-gray-500">
-                            Qty: {item.quantity}
-                          </p>
-                          <ReviewForm foodId={item.food?._id} />
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
-
-                {/* <div className="mt-4 flex justify-end">
-                  <Link
-                    to={`/orders/${order._id}`}
-                    className="text-sm font-medium text-blue-600 hover:text-blue-500"
-                  >
-                    View order details →
-                  </Link>
-                </div> */}
-              </div>
-            ))}
+              ))}
           </div>
         )}
       </div>

@@ -54,9 +54,18 @@ const Navbar = () => {
       <div className="bg-[#142850] text-white shadow-md fixed top-0 left-0 w-full z-40 ease-in duration-300 backdrop-blur-md">
         <div className="py-3 px-10 sm:px-4 md:px-6 lg:px-6  mx-auto">
           <div className="flex items-center justify-between ">
-            <Link to="/">
-              <img src="./logo.png" alt="" className="h-14 cursor-pointer" />
-            </Link>
+            {user?.role === "admin" ? (
+              <Link
+                to="/dashboard"
+                className=" text-xl font-medium hover:text-red-500"
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <Link to="/">
+                <img src="./logo.png" alt="" className="h-14 cursor-pointer" />
+              </Link>
+            )}
 
             {/* All links  */}
             <div className="lg:flex hidden gap-8 items-center">

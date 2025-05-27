@@ -66,14 +66,14 @@ export const fetchAllOrdersAdmin = createAsyncThunk(
 //this is for status change
 export const changeOrderStatus = createAsyncThunk(
   "orders/changeOrderStatus",
-  async ({ orderId, status }, { rejectWithValue }) => {
+  async ({ orderId, updateData }, { rejectWithValue }) => {
     try {
       const response = await axios.put(
         `${BASE_URL}/api/v1/order/orderStatus/${orderId}`,
-        { status },
+        updateData,
         { withCredentials: true }
       );
-      return response.data.order;
+      return { orderId, updatedOrder: response.data.order };
     } catch (error) {
       return rejectWithValue(
         error.response.data.message || "Failed to change order status."
@@ -92,10 +92,15 @@ const orderSlice = createSlice({
   },
   reducers: {
     updateOrderStatus: (state, action) => {
-      const { orderId, status } = action.payload;
+      const { orderId, updateData } = action.payload;
       const order = state.orders.find((order) => order._id === orderId);
       if (order) {
-        order.payment.status = status;
+        if (updateData.orderStatus) {
+          order.orderStatus = updateData.orderStatus;
+        }
+        if (updateData["payment.status"]) {
+          order.payment.status = updateData["payment.status"];
+        }
       }
     },
   },
@@ -115,30 +120,54 @@ const orderSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
+      .addCase(fetchOrderHistory.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(fetchOrderHistory.fulfilled, (state, action) => {
         state.isLoading = false;
         state.error = null;
         state.orders = action.payload || [];
       })
-      .addCase(fetchOrderHistory.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
       .addCase(fetchOrderHistory.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
+      .addCase(fetchAllOrdersAdmin.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(fetchAllOrdersAdmin.fulfilled, (state, action) => {
-        state.orders = action.payload;
         state.isLoading = false;
-        state.orders = action.payload;
+        state.error = null;
+        state.orders = action.payload || [];
+      })
+      .addCase(fetchAllOrdersAdmin.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(changeOrderStatus.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
       })
       .addCase(changeOrderStatus.fulfilled, (state, action) => {
-        (state.isLoading = false), (state.error = null);
+        state.isLoading = false;
+        const { orderId, updatedOrder } = action.payload;
+        const index = state.orders.findIndex((order) => order._id === orderId);
+        if (index !== -1) {
+          state.orders[index] = {
+            ...state.orders[index],
+            ...updatedOrder,
+          };
+        }
+      })
+      .addCase(changeOrderStatus.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
       });
   },
 });
 
 //actions
-
+export const { updateOrderStatus } = orderSlice.actions;
 export default orderSlice.reducer;
