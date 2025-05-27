@@ -18,6 +18,7 @@ import AdminOrderPage from "./pages/OrderPage";
 import UserOrderPage from "./pages/UserOrderPage";
 import { useSelector } from "react-redux";
 import CheckAuth from "./components/common/CheckAuth";
+import AdminDashboardPage from "./pages/DashboardCard";
 
 function App() {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
@@ -104,6 +105,7 @@ function App() {
         />
         {/* This is common  */}
         <Route path="/menu" element={<MenuPage />} />
+        <Route path="/dashboard" element={<AdminDashboardPage />} />
       </Routes>
 
       <Footer />
