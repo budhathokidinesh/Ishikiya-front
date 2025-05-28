@@ -1,64 +1,134 @@
-// src/components/Receipt.js
 import React from "react";
+import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
 
-const Receipt = ({ order }) => {
-  return (
-    <div
-      style={{ padding: 20, fontFamily: "Arial, sans-serif", maxWidth: 500 }}
-    >
-      <h1>Receipt</h1>
-      <p>
-        <strong>Order ID:</strong> {order._id}
-      </p>
-      <p>
-        <strong>Date:</strong> {new Date(order.createdAt).toLocaleDateString()}
-      </p>
+// Define styles
+const styles = StyleSheet.create({
+  page: {
+    padding: 40,
+    fontSize: 11,
+    fontFamily: "Helvetica",
+    lineHeight: 1.5,
+  },
+  header: {
+    marginBottom: 20,
+    borderBottom: "1pt solid #ccc",
+    paddingBottom: 10,
+  },
+  businessInfo: {
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+  section: {
+    marginBottom: 12,
+  },
+  tableHeader: {
+    flexDirection: "row",
+    borderBottom: "1pt solid #333",
+    fontWeight: "bold",
+    paddingBottom: 4,
+    marginTop: 8,
+  },
+  tableRow: {
+    flexDirection: "row",
+    paddingVertical: 4,
+    borderBottom: "0.5pt solid #ddd",
+  },
+  tableCol: {
+    flex: 1,
+    paddingHorizontal: 4,
+  },
+  tableColRight: {
+    flex: 1,
+    paddingHorizontal: 4,
+    textAlign: "right",
+  },
+  totalRow: {
+    marginTop: 12,
+    textAlign: "right",
+    fontSize: 13,
+    fontWeight: "bold",
+  },
+  footer: {
+    marginTop: 20,
+    fontSize: 10,
+    color: "#666",
+    textAlign: "center",
+    borderTop: "1pt solid #ccc",
+    paddingTop: 10,
+  },
+});
 
-      <p>
-        <strong>Payment Method:</strong> {order.payment.method}
-      </p>
-      {order.payment.transitionId && (
-        <p>
-          <strong>Transaction ID:</strong> {order.payment.transitionId}
-        </p>
-      )}
-      <p>
-        <strong>Status:</strong> {order.payment.status}
-      </p>
+const ReceiptPDF = ({ order }) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.businessInfo}>Alkimos Fish and Chips</Text>
+        <Text>17 Turnstone St, Alkimos WA 6038</Text>
+        <Text>sam@gmail.com</Text>
+      </View>
 
-      <h3>Items:</h3>
-      <table width="100%" style={{ borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={{ borderBottom: "1px solid #ddd", textAlign: "left" }}>
-              Item
-            </th>
-            <th style={{ borderBottom: "1px solid #ddd" }}>Qty</th>
-            <th style={{ borderBottom: "1px solid #ddd" }}>Price</th>
-            <th style={{ borderBottom: "1px solid #ddd" }}>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {order.items.map((item, i) => (
-            <tr key={i}>
-              <td style={{ padding: "8px 0" }}>
-                {item.food?.title || "Unknown Item"}
-              </td>
-              <td style={{ textAlign: "center" }}>{item.quantity}</td>
-              <td style={{ textAlign: "right" }}>${item.price.toFixed(2)}</td>
-              <td style={{ textAlign: "right" }}>
-                ${(item.quantity * item.price).toFixed(2)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* Order Info */}
+      <View style={styles.section}>
+        <Text>
+          <Text style={{ fontWeight: "bold" }}>Receipt:</Text> #
+          {order._id.slice(-6)}
+        </Text>
+        <Text>
+          <Text style={{ fontWeight: "bold" }}>Date:</Text>{" "}
+          {new Date(order.createdAt).toLocaleString()}
+        </Text>
+        <Text>
+          <Text style={{ fontWeight: "bold" }}>Payment Method:</Text>{" "}
+          {order.payment.method}
+        </Text>
+        {order.payment.transitionId && (
+          <Text>
+            <Text style={{ fontWeight: "bold" }}>Transaction ID:</Text>{" "}
+            {order.payment.transitionId}
+          </Text>
+        )}
+        <Text>
+          <Text style={{ fontWeight: "bold" }}>Status:</Text>{" "}
+          {order.payment.status}
+        </Text>
+      </View>
 
-      <h3 style={{ textAlign: "right", marginTop: 20 }}>
+      {/* Items Table */}
+      <View>
+        <View style={styles.tableHeader}>
+          <Text style={styles.tableCol}>Item</Text>
+          <Text style={styles.tableColRight}>Qty</Text>
+          <Text style={styles.tableColRight}>Price</Text>
+          <Text style={styles.tableColRight}>Total</Text>
+        </View>
+
+        {order.items.map((item, idx) => (
+          <View style={styles.tableRow} key={idx}>
+            <Text style={styles.tableCol}>
+              {item.food?.title || "Unknown Item"}
+            </Text>
+            <Text style={styles.tableColRight}>{item.quantity}</Text>
+            <Text style={styles.tableColRight}>${item.price.toFixed(2)}</Text>
+            <Text style={styles.tableColRight}>
+              ${(item.quantity * item.price).toFixed(2)}
+            </Text>
+          </View>
+        ))}
+      </View>
+
+      {/* Total */}
+      <Text style={styles.totalRow}>
         Total: ${order.totalAmount.toFixed(2)}
-      </h3>
-    </div>
-  );
-};
+      </Text>
 
-export default Receipt;
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Text>Thank you for choosing us.</Text>
+        <Text>Generated on {new Date().toLocaleString()}</Text>
+      </View>
+    </Page>
+  </Document>
+);
+
+export default ReceiptPDF;

@@ -39,14 +39,7 @@ const UserOrderPage = () => {
   };
   //this is for generating the receipt
   const handleDownloadReceipt = (order) => {
-    const TestReceipt = () => (
-      <div style={{ background: "#fff", color: "#000", padding: "40px" }}>
-        <h1>Test Receipt</h1>
-        <p>Order ID: {order._id}</p>
-        <p>Total: ${order.totalAmount}</p>
-      </div>
-    );
-    GenerateReceiptPDF(order, TestReceipt).catch((err) => {
+    GenerateReceiptPDF(order, Receipt).catch((err) => {
       console.error("Error generating PDF:", err);
     });
   };
