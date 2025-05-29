@@ -60,7 +60,13 @@ export const loginUser = createAsyncThunk(
 
 //this is for logout user
 export const LogoutUser = createAsyncThunk("/user/logoutUser", async () => {
-  const response = await axios.post(`${BASE_URL}/api/v1/auth/logout`);
+  const response = await axios.post(
+    `${BASE_URL}/api/v1/auth/logout`,
+    {},
+    {
+      withCredentials: true,
+    }
+  );
   return response.data;
 });
 
@@ -131,6 +137,7 @@ const userSlice = createSlice({
       .addCase(LogoutUser.fulfilled, (state) => {
         (state.isLoading = false), (state.user = null);
         state.isAuthenticated = false;
+        state.token = null;
       });
   },
 });
