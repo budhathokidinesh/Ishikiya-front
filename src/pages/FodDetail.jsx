@@ -85,6 +85,7 @@ const FoodDetail = () => {
         alert("Failed to delete. Try again");
       });
   };
+
   return (
     <>
       <div className="pt-[16vh] px-10 sm:px-4 md:px-6">
@@ -173,13 +174,25 @@ const FoodDetail = () => {
             {foodDetails.reviews?.length > 0 ? (
               <div className="space-y-4 max-h-[300px] overflow-y-auto">
                 {foodDetails.reviews.map((review, index) => (
-                  <div key={index} className="border-b pb-2 last:border-none">
-                    <div className="flex items-center space-x-2 text-yellow-500 mb-1">
-                      {[...Array(review.rating)].map((_, i) => (
-                        <CiStar key={i} size={16} />
-                      ))}
+                  <div
+                    key={index}
+                    className="flex gap-4 border-b pb-4 items-start"
+                  >
+                    {/* Avatar Circle */}
+                    <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm">
+                      {review.user?.name?.charAt(0).toUpperCase() || "?"}
                     </div>
-                    <p className="text-sm text-black">{review.comment}</p>
+
+                    {/* Review Content */}
+                    <div>
+                      <p className="font-semibold text-gray-800">
+                        {review.user?.name || "Anonymous"}
+                      </p>
+                      <p className="text-sm text-black">{review.comment}</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {new Date(review.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
                 ))}
               </div>

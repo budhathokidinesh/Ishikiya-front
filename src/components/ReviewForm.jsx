@@ -16,9 +16,7 @@ const ReviewForm = ({ foodId }) => {
     setError("");
 
     try {
-      await dispatch(
-        addReview({ foodId, reviewData: { rating, comment } })
-      ).unwrap();
+      await dispatch(addReview({ foodId, reviewData: { comment } })).unwrap();
       setSubmitted(true);
       setShowForm(false); // close form after successful submission
     } catch (err) {
@@ -39,20 +37,6 @@ const ReviewForm = ({ foodId }) => {
 
       {showForm && !submitted && (
         <form onSubmit={handleSubmit} className="mt-2 space-y-2">
-          <div>
-            <label className="text-sm text-gray-700">Rating:</label>
-            <select
-              className="ml-2 border rounded px-2 py-1"
-              value={rating}
-              onChange={(e) => setRating(e.target.value)}
-            >
-              {[5, 4, 3, 2, 1].map((val) => (
-                <option key={val} value={val}>
-                  {val} Star{val > 1 ? "s" : ""}
-                </option>
-              ))}
-            </select>
-          </div>
           <textarea
             className="w-full border rounded p-2 text-sm"
             rows={2}
