@@ -13,11 +13,17 @@ const CartDrawer = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
   const { cartItems, totalPrice } = useSelector((state) => state.cart);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   //this is for handling in checkout
   const handleOnCheckout = async () => {
     if (cartItems.length === 0) {
       alert("Your cart is empty");
+      return;
+    }
+
+    if (!acceptedTerms) {
+      alert("You must accept the Terms and Conditions before proceeding");
       return;
     }
 
@@ -104,7 +110,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 bg-black/40 flex justify-end z-50">
       <div
         ref={drawerRef}
-        className="bg-white w-96 p-6 shadow-lg h-full flex flex-col"
+        className="bg-white w-full sm:w-[500px] p-6 shadow-lg h-full flex flex-col"
       >
         {/*This is for  Header */}
         <div className="flex justify-between items-center border-b pb-4">
@@ -246,9 +252,36 @@ const CartDrawer = ({ isOpen, onClose }) => {
                 <FiTrash2 />
                 {showClearConfirm ? "Cancel" : "Clear Cart"}
               </button>
+              {/* This is for terms and conditions  */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="acceptTerms"
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  className="w-4 h-4 mt-0.5"
+                />
+                <label htmlFor="acceptTerms" className="text-sm text-gray-700">
+                  I accept the{" "}
+                  <a
+                    href="/order-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    Terms and Conditions
+                  </a>
+                </label>
+              </div>
+              {/* This is for process to checkout  */}
               <button
                 onClick={handleOnCheckout}
-                className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-medium transition cursor-pointer"
+                disabled={!acceptedTerms}
+                className={`w-full py-3 rounded-lg font-medium transition cursor-pointer ${
+                  acceptedTerms
+                    ? "bg-red-500 hover:bg-red-600 text-white"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
               >
                 Proceed to Checkout
               </button>

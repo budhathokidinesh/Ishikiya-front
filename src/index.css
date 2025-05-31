@@ -4,8 +4,15 @@
   themes: false;
 }
 
+html,
+body,
 #root {
-  max-width: 1440px;
+  height: 100%;
   margin: 0;
   padding: 0;
+}
+
+#root {
+  max-width: 1440px;
+  margin: 0 auto; /* centers content */
 }

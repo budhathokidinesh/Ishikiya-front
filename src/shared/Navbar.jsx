@@ -166,9 +166,6 @@ const Navbar = () => {
                         >
                           View cart
                         </button>
-                        <button className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-medium transition cursor-pointer">
-                          Proceed to Checkout
-                        </button>
                       </div>
                     </div>
                   </div>

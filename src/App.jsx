@@ -19,97 +19,106 @@ import UserOrderPage from "./pages/UserOrderPage";
 import { useSelector } from "react-redux";
 import CheckAuth from "./components/common/CheckAuth";
 import AdminDashboardPage from "./pages/DashboardCard";
+import RefundPolicy from "./pages/RefundPolicy";
+import OrderPolicy from "./pages/OrderPolicy";
 
 function App() {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   return (
-    <>
+    <div className="app-layout">
       <Navbar />
-      <Routes>
-        {/* This is for authentication  */}
-        <Route path="/" element={<HomePage />} />
-        <Route
-          path="/login"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <LoginPage />
-            </CheckAuth>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <RegisterPage />
-            </CheckAuth>
-          }
-        />
-        <Route path="/verify-otp" element={<OtpVerifyPage />} />
-        <Route path="/forgot-password" element={<ForgotResetPasswordPage />} />
-        <Route
-          path="/forgot-password/:token"
-          element={<ForgotResetPasswordPage />}
-        />
-        {/* This is for admin side  */}
-        <Route
-          path="/addfood"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <AddFood />
-            </CheckAuth>
-          }
-        />
-        <Route
-          path="/admin-order"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <AdminOrderPage />
-            </CheckAuth>
-          }
-        />
+      <div className="main-content">
+        <Routes>
+          {/* This is for authentication  */}
+          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/login"
+            element={
+              <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+                <LoginPage />
+              </CheckAuth>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+                <RegisterPage />
+              </CheckAuth>
+            }
+          />
+          <Route path="/verify-otp" element={<OtpVerifyPage />} />
+          <Route
+            path="/forgot-password"
+            element={<ForgotResetPasswordPage />}
+          />
+          <Route
+            path="/forgot-password/:token"
+            element={<ForgotResetPasswordPage />}
+          />
+          {/* This is for admin side  */}
+          <Route
+            path="/addfood"
+            element={
+              <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+                <AddFood />
+              </CheckAuth>
+            }
+          />
+          <Route
+            path="/admin-order"
+            element={
+              <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+                <AdminOrderPage />
+              </CheckAuth>
+            }
+          />
 
-        <Route path="/aboutus" element={<AboutUsPage />} />
-        <Route path="/fooddetail/:id" element={<FodDetail />} />
-        {/* This is user side  */}
-        <Route
-          path="/profile"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <ProfilePage />
-            </CheckAuth>
-          }
-        />
-        <Route
-          path="/order-success"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <SuccessPage />
-            </CheckAuth>
-          }
-        />
-        <Route
-          path="/cancel"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <CancelPage />
-            </CheckAuth>
-          }
-        />
-        <Route
-          path="/orders"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <UserOrderPage />
-            </CheckAuth>
-          }
-        />
-        {/* This is common  */}
-        <Route path="/menu" element={<MenuPage />} />
-        <Route path="/dashboard" element={<AdminDashboardPage />} />
-      </Routes>
+          <Route path="/aboutus" element={<AboutUsPage />} />
+          <Route path="/fooddetail/:id" element={<FodDetail />} />
+          {/* This is user side  */}
+          <Route
+            path="/profile"
+            element={
+              <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+                <ProfilePage />
+              </CheckAuth>
+            }
+          />
+          <Route
+            path="/order-success"
+            element={
+              <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+                <SuccessPage />
+              </CheckAuth>
+            }
+          />
+          <Route
+            path="/cancel"
+            element={
+              <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+                <CancelPage />
+              </CheckAuth>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+                <UserOrderPage />
+              </CheckAuth>
+            }
+          />
+          {/* This is common  */}
+          <Route path="/menu" element={<MenuPage />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
+          <Route path="/order-policy" element={<OrderPolicy />} />
+          <Route path="/dashboard" element={<AdminDashboardPage />} />
+        </Routes>
+      </div>
 
       <Footer />
-    </>
+    </div>
   );
 }
 
