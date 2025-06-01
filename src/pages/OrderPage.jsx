@@ -7,25 +7,48 @@ import {
   changeOrderStatus,
   fetchAllOrdersAdmin,
 } from "@/store/order/orderSlice";
+import { useLocation } from "react-router-dom";
 
 const AdminOrderPage = () => {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
   const dispatch = useDispatch();
   const [updatingOrders, setUpdatingOrders] = useState({});
   const { orders, isLoading, error } = useSelector((state) => state.order);
+  const filter = searchParams.get("filter") || "All";
+  const startDateParam = searchParams.get("startDate");
+  const endDateParam = searchParams.get("endDate");
 
   // FILTER STATES
-  const [statusFilter, setStatusFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState(filter);
 
   // Default to today's date range
   const [dateFilter, setDateFilter] = useState({
-    startDate: new Date(new Date().setHours(0, 0, 0, 0)),
-    endDate: new Date(new Date().setHours(23, 59, 59, 999)),
+    startDate: startDateParam
+      ? new Date(startDateParam + "T00:00:00")
+      : new Date(new Date().setHours(0, 0, 0, 0)),
+    endDate: endDateParam
+      ? new Date(endDateParam + "T23:59:59")
+      : new Date(new Date().setHours(23, 59, 59, 999)),
   });
 
   useEffect(() => {
     dispatch(fetchAllOrdersAdmin());
   }, [dispatch]);
 
+  useEffect(() => {
+    if (filter) setStatusFilter(filter);
+    if (startDateParam)
+      setDateFilter((prev) => ({
+        ...prev,
+        startDate: new Date(startDateParam + "T00:00:00"),
+      }));
+    if (endDateParam)
+      setDateFilter((prev) => ({
+        ...prev,
+        endDate: new Date(endDateParam + "T23:59:59"),
+      }));
+  }, [filter, startDateParam, endDateParam]);
   // Update order status handler (your existing code)
   const handleStatusChange = async (orderId, newStatus, statusType) => {
     setUpdatingOrders((prev) => ({

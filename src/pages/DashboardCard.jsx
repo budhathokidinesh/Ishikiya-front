@@ -3,9 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchAllOrdersAdmin } from "@/store/order/orderSlice";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Link, useNavigate } from "react-router-dom";
 
-const DashboardCard = ({ title, value }) => (
-  <Card className="text-center shadow-sm">
+const DashboardCard = ({ title, value, onClick }) => (
+  <Card className="text-center shadow-sm" onClick={onClick}>
     <CardContent>
       <h4 className="text-sm font-bold text-gray-800 mb-1">{title}</h4>
       <p className="text-2xl font-semibold text-yellow-500">{value}</p>
@@ -15,7 +16,8 @@ const DashboardCard = ({ title, value }) => (
 
 const AdminDashboardPage = () => {
   const dispatch = useDispatch();
-  const { orders, users } = useSelector((state) => state.order);
+  const { orders } = useSelector((state) => state.order);
+  const navigate = useNavigate();
 
   const [today, setToday] = useState({
     startDate: new Date(new Date().setHours(0, 0, 0, 0)),
@@ -38,14 +40,41 @@ const AdminDashboardPage = () => {
   const completedOrders = filteredOrders.filter(
     (o) => o.orderStatus === "Completed"
   ).length;
-  const revenue = filteredOrders
-    .reduce((sum, o) => sum + o.totalAmount, 0)
-    .toFixed(2);
-  const avgOrderValue = totalOrders ? (revenue / totalOrders).toFixed(2) : 0;
+  const revenue = filteredOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+  const avgOrderValue = totalOrders
+    ? (revenue / totalOrders).toFixed(2)
+    : "0.00";
+  const revenueDisplay = revenue.toFixed(2);
   const uniqueUserIds = new Set(
     filteredOrders.map((order) => order.buyer?._id)
   );
   const totalUsers = uniqueUserIds.size;
+
+  const handleCardClick = (filter) => {
+    let url = "/admin-order";
+
+    // Use today's date string in YYYY-MM-DD format
+    const todayDate = new Date().toISOString().slice(0, 10);
+
+    const startDate = todayDate;
+    const endDate = todayDate;
+    switch (filter) {
+      case "today":
+        url += `?filter=All&startDate=${startDate}&endDate=${endDate}`;
+        break;
+      case "pending":
+        url += `?filter=Order Placed&startDate=${startDate}&endDate=${endDate}`;
+        break;
+      case "completed":
+        url += `?filter=Completed&startDate=${startDate}&endDate=${endDate}`;
+        break;
+      // For revenue, avgOrder, users, just navigate without filters or your logic
+      default:
+        url += `?filter=All&startDate=${startDate}&endDate=${endDate}`;
+    }
+
+    navigate(url);
+  };
 
   return (
     <div className="pt-[18vh] px-4 max-w-7xl mx-auto">
@@ -57,12 +86,38 @@ const AdminDashboardPage = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <DashboardCard title="Total Orders (Today)" value={totalOrders} />
-        <DashboardCard title="Pending Orders" value={pendingOrders} />
-        <DashboardCard title="Completed Orders" value={completedOrders} />
-        <DashboardCard title="Revenue ($)" value={revenue} />
-        <DashboardCard title="Avg. Order Value ($)" value={avgOrderValue} />
-        <DashboardCard title="Total Users" value={totalUsers} />
+        <DashboardCard
+          title="Total Orders (Today)"
+          value={totalOrders}
+          onClick={() => handleCardClick("today")}
+        />
+
+        <DashboardCard
+          title="Pending Orders"
+          value={pendingOrders}
+          onClick={() => handleCardClick("pending")}
+        />
+        <DashboardCard
+          title="Completed Orders"
+          value={completedOrders}
+          onClick={() => handleCardClick("completed")}
+        />
+
+        <DashboardCard
+          title="Revenue ($)"
+          value={revenueDisplay}
+          onClick={() => handleCardClick("revenue")}
+        />
+        <DashboardCard
+          title="Avg. Order Value ($)"
+          value={avgOrderValue}
+          onClick={() => handleCardClick("avgOrder")}
+        />
+        <DashboardCard
+          title="Total Users"
+          value={totalUsers}
+          onClick={() => handleCardClick("users")}
+        />
       </div>
     </div>
   );
