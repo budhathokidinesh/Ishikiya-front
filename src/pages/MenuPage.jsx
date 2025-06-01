@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { CiStar } from "react-icons/ci";
 import { Link, useParams } from "react-router-dom";
 import { addToCart, fetchCart } from "@/store/cart/cartSlice";
+import { getOrCreateGuestId } from "@/utils/guestId";
 
 const MenuPage = () => {
   const dispatch = useDispatch();
@@ -55,7 +56,7 @@ const MenuPage = () => {
   console.log(foodList, "Foodlist");
   //this is for handling the add to cart items
   const handleAddToCart = (item) => {
-    console.log("Selected Item:", item);
+    getOrCreateGuestId();
     const selectedItem = {
       foodId: item._id,
       quantity: 1,

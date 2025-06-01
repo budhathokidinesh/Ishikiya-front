@@ -1,7 +1,9 @@
+import { getOrCreateGuestId } from "@/utils/guestId";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
+const getGuestId = () => getOrCreateGuestId();
 
 //initial state
 const initialState = {
@@ -17,7 +19,9 @@ export const fetchCart = createAsyncThunk(
   "cart/fetchCart",
   async (_, { rejectWithValue }) => {
     try {
+      const guestId = getGuestId();
       const response = await axios.get(`${BASE_URL}/api/v1/cart/getCart`, {
+        params: guestId ? { guestId } : {},
         withCredentials: true,
       });
       return response.data.cart;
@@ -34,9 +38,10 @@ export const addToCart = createAsyncThunk(
   "cart/addToCart",
   async ({ foodId, quantity = 1 }, { rejectWithValue }) => {
     try {
+      const guestId = getGuestId();
       const response = await axios.post(
         `${BASE_URL}/api/v1/cart/addCart`,
-        { foodId, quantity },
+        { foodId, quantity, guestId },
         {
           withCredentials: true,
         }
@@ -55,9 +60,10 @@ export const updateCartItem = createAsyncThunk(
   "cart/updateCartItem",
   async ({ foodId, quantity }, { rejectWithValue }) => {
     try {
+      const guestId = getGuestId();
       const response = await axios.put(
         `${BASE_URL}/api/v1/cart/updateCart`,
-        { foodId, quantity },
+        { foodId, quantity, guestId },
         {
           withCredentials: true,
         }
@@ -75,10 +81,11 @@ export const removeFromCart = createAsyncThunk(
   "cart/removeFromCart",
   async ({ foodId }, { rejectWithValue }) => {
     try {
+      const guestId = getGuestId();
       const response = await axios.delete(
         `${BASE_URL}/api/v1/cart/deleteCartItem`,
         {
-          data: { foodId },
+          data: { foodId, guestId },
           withCredentials: true,
         }
       );
@@ -95,7 +102,10 @@ export const clearCart = createAsyncThunk(
   "cart/clearCart",
   async (_, { rejectWithValue }) => {
     try {
+      const guestId = getGuestId();
+
       const response = await axios.delete(`${BASE_URL}/api/v1/cart/clearCart`, {
+        data: { guestId },
         withCredentials: true,
       });
       return response.data.cart;
