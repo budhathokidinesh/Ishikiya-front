@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 const DashboardCard = ({ title, value }) => (
   <Card className="text-center shadow-sm">
     <CardContent>
-      <h4 className="text-sm text-gray-500 mb-1">{title}</h4>
-      <p className="text-2xl font-semibold text-gray-800">{value}</p>
+      <h4 className="text-sm font-bold text-gray-800 mb-1">{title}</h4>
+      <p className="text-2xl font-semibold text-yellow-500">{value}</p>
     </CardContent>
   </Card>
 );
@@ -33,16 +33,19 @@ const AdminDashboardPage = () => {
 
   const totalOrders = filteredOrders.length;
   const pendingOrders = filteredOrders.filter(
-    (o) => o.payment.status === "Order Placed"
+    (o) => o.orderStatus === "Order Placed"
   ).length;
   const completedOrders = filteredOrders.filter(
-    (o) => o.payment.status === "Completed"
+    (o) => o.orderStatus === "Completed"
   ).length;
   const revenue = filteredOrders
     .reduce((sum, o) => sum + o.totalAmount, 0)
     .toFixed(2);
   const avgOrderValue = totalOrders ? (revenue / totalOrders).toFixed(2) : 0;
-  const totalUsers = users?.length ?? 0;
+  const uniqueUserIds = new Set(
+    filteredOrders.map((order) => order.buyer?._id)
+  );
+  const totalUsers = uniqueUserIds.size;
 
   return (
     <div className="pt-[18vh] px-4 max-w-7xl mx-auto">
