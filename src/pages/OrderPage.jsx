@@ -13,11 +13,20 @@ const AdminOrderPage = () => {
   const [updatingOrders, setUpdatingOrders] = useState({});
   const { orders, isLoading, error } = useSelector((state) => state.order);
 
+  // FILTER STATES
+  const [statusFilter, setStatusFilter] = useState("All");
+
+  // Default to today's date range
+  const [dateFilter, setDateFilter] = useState({
+    startDate: new Date(new Date().setHours(0, 0, 0, 0)),
+    endDate: new Date(new Date().setHours(23, 59, 59, 999)),
+  });
+
   useEffect(() => {
     dispatch(fetchAllOrdersAdmin());
   }, [dispatch]);
 
-  //this is for updating the order status
+  // Update order status handler (your existing code)
   const handleStatusChange = async (orderId, newStatus, statusType) => {
     setUpdatingOrders((prev) => ({
       ...prev,
@@ -31,18 +40,16 @@ const AdminOrderPage = () => {
         updatedData.paymentStatus = newStatus;
       }
 
-      // Make the API call
       await dispatch(
         changeOrderStatus({ orderId, updateData: updatedData })
       ).unwrap();
-      // Dispatch an action to update Redux state
+
       dispatch({
         type: "orders/updateOrderStatus",
         payload: { orderId, updatedData },
       });
     } catch (error) {
       console.error("Failed to update order status:", error);
-      // Revert the optimistic update if needed
       dispatch(fetchAllOrdersAdmin());
     } finally {
       setUpdatingOrders((prev) => ({
@@ -51,11 +58,26 @@ const AdminOrderPage = () => {
       }));
     }
   };
+
+  // Filter orders by date and status
+  const filteredOrders = orders.filter((order) => {
+    const createdAt = new Date(order.createdAt);
+    const isWithinDateRange =
+      createdAt >= dateFilter.startDate && createdAt <= dateFilter.endDate;
+
+    const matchesStatus =
+      statusFilter === "All" ? true : order.orderStatus === statusFilter;
+
+    return isWithinDateRange && matchesStatus;
+  });
+
+  // Helper function to format date to YYYY-MM-DD for input value
+  const formatDate = (date) => date.toISOString().split("T")[0];
   //this is for changing color
   const getStatusColor = (status, type = "order") => {
     if (type === "payment") {
       switch (status) {
-        case "Completed":
+        case "Paid":
           return "bg-green-100 text-green-800";
         case "Processing":
           return "bg-blue-100 text-blue-800";
@@ -66,7 +88,7 @@ const AdminOrderPage = () => {
         case "Refunded":
           return "bg-purple-100 text-purple-800";
         default:
-          return "bg-gray-100 text-gray-800";
+          return "bg-green-100 text-green-800";
       }
     } else {
       switch (status) {
@@ -85,7 +107,6 @@ const AdminOrderPage = () => {
       }
     }
   };
-
   return (
     <div className="pt-[18vh] px-4 max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-8">
@@ -100,6 +121,66 @@ const AdminOrderPage = () => {
         </div>
       </div>
 
+      {/* FILTER CONTROLS */}
+      <div className="flex space-x-4 mb-6 items-center">
+        {/* Status Filter */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Filter by Order Status
+          </label>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="border rounded px-3 py-2 text-sm"
+          >
+            <option value="All">All</option>
+            <option value="Order Placed">Order Placed</option>
+            <option value="Processing">Processing</option>
+            <option value="Ready">Ready</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        {/* Date Filter */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Start Date
+          </label>
+          <input
+            type="date"
+            value={formatDate(dateFilter.startDate)}
+            max={formatDate(dateFilter.endDate)}
+            onChange={(e) =>
+              setDateFilter((prev) => ({
+                ...prev,
+                startDate: new Date(e.target.value + "T00:00:00"),
+              }))
+            }
+            className="border rounded px-3 py-2 text-sm"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            End Date
+          </label>
+          <input
+            type="date"
+            value={formatDate(dateFilter.endDate)}
+            min={formatDate(dateFilter.startDate)}
+            onChange={(e) =>
+              setDateFilter((prev) => ({
+                ...prev,
+                endDate: new Date(e.target.value + "T23:59:59"),
+              }))
+            }
+            className="border rounded px-3 py-2 text-sm"
+          />
+        </div>
+      </div>
+
+      {/* Render filtered orders */}
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -108,6 +189,7 @@ const AdminOrderPage = () => {
         <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
           <div className="flex">
             <div className="flex-shrink-0">
+              {/* Error icon */}
               <svg
                 className="h-5 w-5 text-red-500"
                 viewBox="0 0 20 20"
@@ -153,53 +235,41 @@ const AdminOrderPage = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {orders?.map((order) => (
-                    <tr
-                      key={order._id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        <span className="font-mono">
-                          #{order._id.slice(-6)}
-                        </span>
+                  {filteredOrders.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="text-center py-8 text-gray-500 font-medium"
+                      >
+                        No orders found for selected filters.
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {order.buyer?.name || "N/A"}
-                        {order.buyer?.email && (
-                          <div className="text-xs text-gray-400">
-                            {order.buyer.email}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
-                        ${order.totalAmount.toFixed(2)}
-                      </td>
-                      {/* THis is for order status  */}
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
-                            order.orderStatus,
-                            "order"
-                          )}`}
-                        >
-                          {order.orderStatus}
-                        </span>
-                      </td>
-                      {/* This is for payment status  */}
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
-                            order.payment.status,
-                            "payment"
-                          )}`}
-                        >
-                          {order.payment.status}
-                        </span>
-                      </td>
-
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <div className="flex space-x-2">
+                    </tr>
+                  ) : (
+                    filteredOrders.map((order) => (
+                      <tr
+                        key={order._id}
+                        className="hover:bg-gray-50 transition-colors"
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-700">
+                          {order._id.slice(-6)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                          {order.buyer?.name || "N/A"}
+                          {order.buyer?.phone && (
+                            <div className="text-xs text-gray-400">
+                              {order.buyer.phone}
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                          $ {order.totalAmount.toFixed(2)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                           <select
+                            className={`border rounded p-1 ${getStatusColor(
+                              order.orderStatus,
+                              "order"
+                            )}`}
                             value={order.orderStatus}
                             onChange={(e) =>
                               handleStatusChange(
@@ -208,11 +278,6 @@ const AdminOrderPage = () => {
                                 "order"
                               )
                             }
-                            className={`block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md ${
-                              updatingOrders[order._id]?.order
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
-                            }`}
                             disabled={updatingOrders[order._id]?.order}
                           >
                             <option value="Order Placed">Order Placed</option>
@@ -221,15 +286,18 @@ const AdminOrderPage = () => {
                             <option value="Completed">Completed</option>
                             <option value="Cancelled">Cancelled</option>
                           </select>
-                          {updatingOrders[order._id]?.order && (
-                            <span className="ml-2 text-xs text-gray-400">
-                              Updating...
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex space-x-2 mt-2">
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                           <select
-                            value={order.payment.status}
+                            className={`border rounded p-1 ${getStatusColor(
+                              order.payment?.status || order.paymentStatus,
+                              "payment"
+                            )}`}
+                            value={
+                              order.payment?.status ||
+                              order.paymentStatus ||
+                              "Completed"
+                            }
                             onChange={(e) =>
                               handleStatusChange(
                                 order._id,
@@ -237,55 +305,30 @@ const AdminOrderPage = () => {
                                 "payment"
                               )
                             }
-                            className={`block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md ${
-                              updatingOrders[order._id]?.payment
-                                ? "opacity-50 cursor-not-allowed"
-                                : ""
-                            }`}
                             disabled={updatingOrders[order._id]?.payment}
                           >
+                            <option value="Paid">Paid</option>
                             <option value="Pending">Pending</option>
                             <option value="Processing">Processing</option>
-                            <option value="Completed">Completed</option>
                             <option value="Failed">Failed</option>
                             <option value="Refunded">Refunded</option>
                           </select>
-                          {updatingOrders[order._id]?.payment && (
-                            <span className="ml-2 text-xs text-gray-400">
-                              Updating...
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                          {/* Your existing action buttons */}
+                          <button
+                            className="text-red-600 hover:text-red-900"
+                            onClick={() => alert("Implement your delete logic")}
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
-            {orders?.length === 0 && (
-              <div className="text-center py-12">
-                <svg
-                  className="mx-auto h-12 w-12 text-gray-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-                </svg>
-                <h3 className="mt-2 text-sm font-medium text-gray-900">
-                  No orders
-                </h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  Get started by creating a new order.
-                </p>
-              </div>
-            )}
           </CardContent>
         </Card>
       )}
