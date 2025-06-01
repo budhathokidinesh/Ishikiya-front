@@ -8,6 +8,7 @@ import {
   fetchAllOrdersAdmin,
 } from "@/store/order/orderSlice";
 import { useLocation } from "react-router-dom";
+import OrderPDFDownloader from "@/components/OrderPDFDownloader";
 
 const AdminOrderPage = () => {
   const location = useLocation();
@@ -141,6 +142,8 @@ const AdminOrderPage = () => {
           >
             Refresh Orders
           </Button>
+
+          <OrderPDFDownloader orders={filteredOrders} />
         </div>
       </div>
 

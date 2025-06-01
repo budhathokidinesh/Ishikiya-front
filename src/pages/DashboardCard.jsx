@@ -80,7 +80,10 @@ const AdminDashboardPage = () => {
     <div className="pt-[18vh] px-4 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold text-gray-800">Admin Dashboard</h2>
-        <Button onClick={() => dispatch(fetchAllOrdersAdmin())}>
+        <Button
+          className="bg-blue-400 text-white"
+          onClick={() => dispatch(fetchAllOrdersAdmin())}
+        >
           Refresh Dashboard
         </Button>
       </div>
