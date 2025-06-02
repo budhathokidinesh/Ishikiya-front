@@ -127,6 +127,17 @@ const cartSlice = createSlice({
       state.totalPrice = 0;
       state.error = null;
     },
+    setCartItems: (state, action) => {
+      state.cartItems = action.payload;
+      state.totalQuantity = action.payload.reduce(
+        (sum, item) => sum + item.quantity,
+        0
+      );
+      state.totalPrice = action.payload.reduce(
+        (sum, item) => sum + item.total,
+        0
+      );
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -198,5 +209,5 @@ const cartSlice = createSlice({
   },
 });
 //actions
-export const { resetCart } = cartSlice.actions;
+export const { resetCart, setCartItems } = cartSlice.actions;
 export default cartSlice.reducer;

@@ -1,13 +1,28 @@
 import { clearCart } from "@/store/cart/cartSlice";
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 const SuccessPage = () => {
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get("session_id");
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state) => state.auth);
   useEffect(() => {
     dispatch(clearCart());
-  }, []);
+    localStorage.removeItem("cartItems");
+  }, [dispatch, sessionId]);
+
+  //This is navigation option
+
+  const handleGoBack = () => {
+    if (isAuthenticated) {
+      navigate("/orders");
+    } else {
+      navigate("/menu");
+    }
+  };
   return (
     <div className="pt-[18vh]">
       <div class="bg-gray-100 h-screen">
@@ -30,12 +45,12 @@ const SuccessPage = () => {
             </p>
             <p> Have a great day! </p>
             <div class="py-10 text-center">
-              <Link
-                to="/orders"
-                class="px-12 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3"
+              <button
+                onClick={handleGoBack}
+                className="px-12 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3"
               >
                 GO BACK
-              </Link>
+              </button>
             </div>
           </div>
         </div>

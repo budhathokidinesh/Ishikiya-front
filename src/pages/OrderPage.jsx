@@ -280,10 +280,10 @@ const AdminOrderPage = () => {
                           {order._id.slice(-6)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {order.buyer?.name || "N/A"}
-                          {order.buyer?.phone && (
+                          {order.buyer?.name || order.guestInfo?.name || "N/A"}
+                          {(order.buyer?.phone || order.guestInfo?.phone) && (
                             <div className="text-xs text-gray-400">
-                              {order.buyer.phone}
+                              {order.buyer?.phone || order.guestInfo?.phone}
                             </div>
                           )}
                         </td>

@@ -9,11 +9,11 @@ const BASE_URL = import.meta.env.VITE_API_URL;
 //this is for placing order
 export const placeOrder = createAsyncThunk(
   "orders/placeOrder",
-  async (orderData, { rejectWithValue }) => {
+  async ({ cart, paymentMethod, guestId, guestInfo }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
         `${BASE_URL}/api/v1/order/placeOrder`,
-        orderData,
+        { cart, paymentMethod, guestId, guestInfo },
         {
           withCredentials: true,
         }

@@ -1,7 +1,7 @@
 import { loginUser } from "@/store/auth/authSlice";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const initialState = {
@@ -14,6 +14,9 @@ const LoginPage = () => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState(initialState);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const redirect = queryParams.get("redirect"); // e.g., 'cart'
 
   //this is for handling change
   const handleOnChange = (e) => {
@@ -42,7 +45,12 @@ const LoginPage = () => {
           } else if (user?.role === "admin") {
             navigate("/admin-order");
           } else {
-            navigate("/menu");
+            if (redirect === "cart") {
+              // navigate to menu page with state to open cart drawer
+              navigate("/menu", { state: { showCart: true } });
+            } else {
+              navigate("/menu");
+            }
           }
         } else {
           toast.error(data?.payload?.message || "Please register your account");

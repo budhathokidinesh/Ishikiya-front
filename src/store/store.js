@@ -17,7 +17,14 @@ import userReducer from "./user/userSlice.js";
 import cartReducer from "./cart/cartSlice.js";
 import orderReducer from "./order/orderSlice.js";
 
-// 👇 Persist config for auth only
+//persist for cart
+const cartPersistConfig = {
+  key: "cart",
+  storage,
+};
+
+const persistedCartReducer = persistReducer(cartPersistConfig, cartReducer);
+// persist for auth
 const authPersistConfig = {
   key: "auth",
   storage,
@@ -30,7 +37,7 @@ const store = configureStore({
     auth: persistedAuthReducer,
     food: foodReducer,
     user: userReducer,
-    cart: cartReducer,
+    cart: persistedCartReducer,
     order: orderReducer,
   },
   middleware: (getDefaultMiddleware) =>

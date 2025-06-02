@@ -8,12 +8,22 @@ import {
   updateCartItem,
 } from "@/store/cart/cartSlice";
 import { placeOrder } from "@/store/order/orderSlice";
+import { getOrCreateGuestId } from "@/utils/guestId";
 
 const CartDrawer = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
   const { cartItems, totalPrice } = useSelector((state) => state.cart);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const { user } = useSelector((state) => state.auth);
+  const [isGuestMode, setIsGuestMode] = useState(false);
+
+  //this is for checkout session for guest user
+  const [guestInfo, setGuestInfo] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
 
   //this is for handling in checkout
   const handleOnCheckout = async () => {
@@ -27,6 +37,15 @@ const CartDrawer = ({ isOpen, onClose }) => {
       return;
     }
 
+    if (!user) {
+      if (!guestInfo?.name || !guestInfo?.email || !guestInfo?.phone) {
+        alert(
+          "Please fill in your name, email, and phone to proceed as guest."
+        );
+        return;
+      }
+    }
+
     try {
       const orderData = {
         cart: cartItems.map((item) => ({
@@ -36,18 +55,18 @@ const CartDrawer = ({ isOpen, onClose }) => {
         paymentMethod: "Stripe",
       };
 
-      // Dispatch the action
-      const response = await dispatch(placeOrder(orderData)).unwrap();
-      console.log("Stripe Response:", response);
+      if (!user) {
+        orderData.guestId = getOrCreateGuestId(); // make sure this returns a unique ID
+        orderData.guestInfo = guestInfo; // ✅ Add guestInfo explicitly
+      }
 
-      // Handle the response
+      const response = await dispatch(placeOrder(orderData)).unwrap();
+
       if (response?.url) {
-        // Redirect to Stripe
-        window.location.href = response.url;
+        dispatch(clearCart());
+        window.location.href = response.url; // redirect to Stripe Checkout
       } else if (response?.order) {
-        // Handle non-Stripe success case
         alert("Order placed successfully!");
-        // Optionally clear loading state
         dispatch(clearCart());
         onClose();
       } else {
@@ -252,39 +271,120 @@ const CartDrawer = ({ isOpen, onClose }) => {
                 <FiTrash2 />
                 {showClearConfirm ? "Cancel" : "Clear Cart"}
               </button>
-              {/* This is for terms and conditions  */}
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="acceptTerms"
-                  checked={acceptedTerms}
-                  onChange={(e) => setAcceptedTerms(e.target.checked)}
-                  className="w-4 h-4 mt-0.5"
-                />
-                <label htmlFor="acceptTerms" className="text-sm text-gray-700">
-                  I accept the{" "}
-                  <a
-                    href="/order-policy"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
+
+              {/* This is for guest user  */}
+              {!user && !isGuestMode && (
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={() => setIsGuestMode(true)}
+                    className="w-full py-3 rounded-lg font-medium bg-blue-500 hover:bg-blue-600 text-white cursor-pointer"
                   >
-                    Terms and Conditions
-                  </a>
-                </label>
-              </div>
+                    Checkout as Guest
+                  </button>
+                  {cartItems.length > 0 && (
+                    <button
+                      onClick={() => {
+                        window.location.href = `/login?redirect=cart`;
+                      }}
+                      className="w-full py-3 rounded-lg font-medium bg-green-300 hover:bg-green-700 text-black hover:text-white cursor-pointer"
+                    >
+                      Login & Checkout
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* This is conditionally showing guest form  */}
+              {!user && isGuestMode && (
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    placeholder="Your Name"
+                    value={guestInfo.name}
+                    onChange={(e) =>
+                      setGuestInfo({ ...guestInfo, name: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border rounded"
+                    required
+                  />
+                  <input
+                    type="email"
+                    placeholder="Your Email"
+                    value={guestInfo.email}
+                    onChange={(e) =>
+                      setGuestInfo({ ...guestInfo, email: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border rounded"
+                    required
+                  />
+                  <input
+                    type="tel"
+                    placeholder="Phone Number"
+                    value={guestInfo.phone}
+                    onChange={(e) =>
+                      setGuestInfo({ ...guestInfo, phone: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border rounded"
+                    required
+                  />
+                  <button
+                    onClick={() => setIsGuestMode(false)}
+                    className="text-sm text-blue-500 hover:underline"
+                  >
+                    Go back to options
+                  </button>
+                </div>
+              )}
+
+              {/* This is for terms and conditions  */}
+              {(user ||
+                (isGuestMode &&
+                  guestInfo.name &&
+                  guestInfo.email &&
+                  guestInfo.phone)) && (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="acceptTerms"
+                    checked={acceptedTerms}
+                    onChange={(e) => setAcceptedTerms(e.target.checked)}
+                    className="w-4 h-4 mt-0.5"
+                  />
+                  <label
+                    htmlFor="acceptTerms"
+                    className="text-sm text-gray-700"
+                  >
+                    I accept the{" "}
+                    <a
+                      href="/order-policy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      Terms and Conditions
+                    </a>
+                  </label>
+                </div>
+              )}
+
               {/* This is for process to checkout  */}
-              <button
-                onClick={handleOnCheckout}
-                disabled={!acceptedTerms}
-                className={`w-full py-3 rounded-lg font-medium transition cursor-pointer ${
-                  acceptedTerms
-                    ? "bg-red-500 hover:bg-red-600 text-white"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
-              >
-                Proceed to Checkout
-              </button>
+              {(user ||
+                (isGuestMode &&
+                  guestInfo.name &&
+                  guestInfo.email &&
+                  guestInfo.phone)) && (
+                <button
+                  onClick={handleOnCheckout}
+                  disabled={!acceptedTerms}
+                  className={`w-full py-3 rounded-lg font-medium transition cursor-pointer ${
+                    acceptedTerms
+                      ? "bg-red-500 hover:bg-red-600 text-white"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  }`}
+                >
+                  Proceed to Checkout
+                </button>
+              )}
             </div>
           </div>
         )}

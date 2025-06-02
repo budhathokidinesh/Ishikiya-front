@@ -7,13 +7,25 @@ import { RxCross2 } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [nav, setNav] = useState(false);
   const { user } = useSelector((state) => state.auth);
+  const location = useLocation();
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
+
+  //this is for items already in the cart
+  useEffect(() => {
+    if (location.state?.showCart) {
+      setCartDrawerOpen(true);
+      // Clear location state so it doesn't reopen drawer on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
   //this is handling logout
   const handleOnLogout = () => {
     try {

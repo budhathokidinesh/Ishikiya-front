@@ -21,11 +21,13 @@ import CheckAuth from "./components/common/CheckAuth";
 import AdminDashboardPage from "./pages/DashboardCard";
 import RefundPolicy from "./pages/RefundPolicy";
 import OrderPolicy from "./pages/OrderPolicy";
+import CartSync from "./utils/CartSync";
 
 function App() {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   return (
     <div className="app-layout">
+      <CartSync />
       <Navbar />
       <div className="main-content">
         <Routes>
@@ -85,22 +87,8 @@ function App() {
               </CheckAuth>
             }
           />
-          <Route
-            path="/order-success"
-            element={
-              <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-                <SuccessPage />
-              </CheckAuth>
-            }
-          />
-          <Route
-            path="/cancel"
-            element={
-              <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-                <CancelPage />
-              </CheckAuth>
-            }
-          />
+          <Route path="/order-success" element={<SuccessPage />} />
+          <Route path="/cancel" element={<CancelPage />} />
           <Route
             path="/orders"
             element={
