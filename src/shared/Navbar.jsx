@@ -217,7 +217,7 @@ const Navbar = () => {
                 </Link>
               )}
             </div>
-
+            {/* This is for mobile responsive  */}
             {/* Hamburgur  */}
             <div className="block lg:hidden z-40" onClick={handleNav}>
               {nav ? (
@@ -231,46 +231,67 @@ const Navbar = () => {
             </div>
             {/* Menu items  */}
             <div
-              className={`lg:hidden absolute w-1/2 sm:w-2/5 h-[70vh] px-4 py-2 font-medium ease-in shadow-sm backdrop-blur-md bg-white/80 top-0 duration-500 ${
+              className={`lg:hidden absolute w-1/2 sm:w-2/5 px-4 py-2 font-medium ease-in shadow-sm backdrop-blur-md bg-blue-400 top-0 duration-500 ${
                 nav ? "right-0" : "right-[-100%]"
-              } pt-24 rounded-xl`}
+              } pt-20 rounded-xl`}
             >
               <div className="flex flex-col gap-8">
-                <a
-                  href=""
-                  className="text-[#191919] text-xl font-medium hover:text-red-500"
+                <Link
+                  to="/"
+                  className=" text-[#191919] text-xl font-medium hover:text-red-500"
                 >
-                  Today Special
-                </a>
-                <a
-                  href=""
+                  Home
+                </Link>
+                {user?.role === "user" ? (
+                  <Link
+                    to="/orders"
+                    className=" text-[#191919] text-xl font-medium hover:text-red-500"
+                  >
+                    Orders
+                  </Link>
+                ) : (
+                  <Link
+                    to="/menu"
+                    className=" text-[#191919] text-xl font-medium hover:text-red-500"
+                  >
+                    Today Special
+                  </Link>
+                )}
+                <Link
+                  to="/aboutus"
                   className="text-[#191919] text-xl font-medium hover:text-red-500"
                 >
                   About Us
-                </a>
-                <a
-                  href=""
-                  className="text-[#191919] text-xl font-medium hover:text-red-500"
-                >
-                  Our Menu
-                </a>
-                <a
-                  href=""
-                  className="text-[#191919] text-xl font-medium hover:text-red-500"
-                >
-                  Add Menu
-                </a>
-                <a
-                  href="/popular"
-                  className="text-[#191919] text-xl font-medium hover:text-red-500"
-                >
-                  Popular Food
-                </a>
-                <Link to="/login">
-                  <button className="bg-[#F54748] active:scale-90 transition duration-100 transform hover:shadow-xl shadow-md rounded-full px-8 py-2 text-xl font-medium text-white cursor-pointer">
-                    Login
-                  </button>
                 </Link>
+                <Link
+                  to="/menu"
+                  className="text-[#191919] text-xl font-medium
+                  hover:text-red-500"
+                >
+                  {" "}
+                  Our Menu
+                </Link>
+                {user?.role === "admin" && (
+                  <Link
+                    to="/addfood"
+                    className="text-[#191919] text-xl font-medium hover:text-red-500"
+                  >
+                    Add Menu
+                  </Link>
+                )}
+                {user ? (
+                  <Link to="/">
+                    <button className="bg-[#F54748] active:scale-90 transition duration-100 transform hover:shadow-xl shadow-md rounded-full px-8 py-2 text-xl font-medium text-white cursor-pointer">
+                      Logout
+                    </button>
+                  </Link>
+                ) : (
+                  <Link to="/login">
+                    <button className="bg-[#F54748] active:scale-90 transition duration-100 transform hover:shadow-xl shadow-md rounded-full px-8 py-2 text-xl font-medium text-white cursor-pointer">
+                      Login
+                    </button>
+                  </Link>
+                )}
               </div>
             </div>
           </div>
