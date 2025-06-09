@@ -281,7 +281,10 @@ const Navbar = () => {
                 )}
                 {user ? (
                   <Link to="/">
-                    <button className="bg-[#F54748] active:scale-90 transition duration-100 transform hover:shadow-xl shadow-md rounded-full px-8 py-2 text-xl font-medium text-white cursor-pointer">
+                    <button
+                      onClick={handleOnLogout}
+                      className="bg-[#F54748] active:scale-90 transition duration-100 transform hover:shadow-xl shadow-md rounded-full px-8 py-2 text-xl font-medium text-white cursor-pointer"
+                    >
                       Logout
                     </button>
                   </Link>
