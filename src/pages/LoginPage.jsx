@@ -73,8 +73,8 @@ const LoginPage = () => {
           <NavLink to="/">
             <img
               src="./logo.png"
-              alt=""
-              className="logo mb-6 cursor-pointer text-center"
+              alt="Logo"
+              className="h-14 w-auto mb-6 cursor-pointer"
             />
           </NavLink>
           {/* Email  */}
