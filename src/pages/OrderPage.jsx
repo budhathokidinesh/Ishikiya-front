@@ -132,9 +132,9 @@ const AdminOrderPage = () => {
     }
   };
   return (
-    <div className="pt-[18vh] px-4 max-w-6xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-800">Admin Orders</h2>
+    <div className="pt-[12vh] px-4 max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-8">
+        <h2 className="text-3xl font-bold text-gray-800 mb-4">Admin Orders</h2>
         <div className="flex space-x-2">
           <Button
             variant="outline"
@@ -148,16 +148,16 @@ const AdminOrderPage = () => {
       </div>
 
       {/* FILTER CONTROLS */}
-      <div className="flex space-x-4 mb-6 items-center">
+      <div className="flex  space-x-2 mb-6 items-center">
         {/* Status Filter */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Filter by Order Status
+        <div className="text-center">
+          <label className="block text-sm  font-semibold text-gray-700 mb-1">
+            Order Status
           </label>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="border rounded px-3 py-2 text-sm"
+            className="border rounded px-2 py-2 text-sm"
           >
             <option value="All">All</option>
             <option value="Order Placed">Order Placed</option>
@@ -169,8 +169,8 @@ const AdminOrderPage = () => {
         </div>
 
         {/* Date Filter */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="text-center">
+          <label className="block text-sm font-semibold text-gray-700 mb-1">
             Start Date
           </label>
           <input
@@ -183,12 +183,12 @@ const AdminOrderPage = () => {
                 startDate: new Date(e.target.value + "T00:00:00"),
               }))
             }
-            className="border rounded px-3 py-2 text-sm"
+            className="border rounded px-2 py-2 text-sm"
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="text-center">
+          <label className="block text-sm font-semibold text-gray-700 mb-1">
             End Date
           </label>
           <input
@@ -201,7 +201,7 @@ const AdminOrderPage = () => {
                 endDate: new Date(e.target.value + "T23:59:59"),
               }))
             }
-            className="border rounded px-3 py-2 text-sm"
+            className="border rounded px-2 py-2 text-sm"
           />
         </div>
       </div>
@@ -236,26 +236,27 @@ const AdminOrderPage = () => {
       ) : (
         <Card className="shadow-lg border-0">
           <CardContent className="p-0">
-            <div className="overflow-x-auto">
+            {/* Responsive wrapper */}
+            <div className="w-full overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Order ID
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Customer
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Total
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Order Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Payment Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
@@ -276,10 +277,10 @@ const AdminOrderPage = () => {
                         key={order._id}
                         className="hover:bg-gray-50 transition-colors"
                       >
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-700">
+                        <td className="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-700">
                           {order._id.slice(-6)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                           {order.buyer?.name || order.guestInfo?.name || "N/A"}
                           {(order.buyer?.phone || order.guestInfo?.phone) && (
                             <div className="text-xs text-gray-400">
@@ -287,10 +288,10 @@ const AdminOrderPage = () => {
                             </div>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                           $ {order.totalAmount.toFixed(2)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                           <select
                             className={`border rounded p-1 ${getStatusColor(
                               order.orderStatus,
@@ -313,7 +314,7 @@ const AdminOrderPage = () => {
                             <option value="Cancelled">Cancelled</option>
                           </select>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                           <select
                             className={`border rounded p-1 ${getStatusColor(
                               order.payment?.status || order.paymentStatus,
@@ -340,8 +341,7 @@ const AdminOrderPage = () => {
                             <option value="Refunded">Refunded</option>
                           </select>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {/* Your existing action buttons */}
+                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
                           <button
                             className="text-red-600 hover:text-red-900"
                             onClick={() => alert("Implement your delete logic")}
