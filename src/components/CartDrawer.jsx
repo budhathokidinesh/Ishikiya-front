@@ -1,4 +1,5 @@
 // src/components/CartDrawer.jsx
+//I need to fix this one as well
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FiPlus, FiMinus, FiTrash2, FiAlertTriangle } from "react-icons/fi";
