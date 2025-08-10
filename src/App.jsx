@@ -75,7 +75,7 @@ function App() {
               </CheckAuth>
             }
           />
-
+          {/* This is common  */}
           <Route path="/aboutus" element={<AboutUsPage />} />
           <Route path="/fooddetail/:id" element={<FodDetail />} />
           {/* This is user side  */}
@@ -101,6 +101,7 @@ function App() {
           <Route path="/menu" element={<MenuPage />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/order-policy" element={<OrderPolicy />} />
+          {/* This is admin side needs to fix  */}
           <Route path="/dashboard" element={<AdminDashboardPage />} />
         </Routes>
       </div>
