@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import RecommendedFood from "@/components/RecommendedFood";
-import Special from "@/components/special";
+import Special from "@/components/Special";
 
 import React from "react";
 
