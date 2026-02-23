@@ -1,3 +1,1 @@
-### ISHIKIYA JAANESE RESTAURANT
-
-## This is the frontend of the Fish and chips shop
+### ALKIMOS BEACH FISH AND CHIPS
