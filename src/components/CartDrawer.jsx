@@ -1,4 +1,3 @@
-// src/components/CartDrawer.jsx
 //I need to fix this one as well
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -130,7 +129,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 bg-black/40 flex justify-end z-50">
       <div
         ref={drawerRef}
-        className="bg-white w-full sm:w-[500px] p-6 shadow-lg h-full flex flex-col"
+        className="bg-blue-600 w-full sm:w-[500px] p-6 shadow-lg h-full flex flex-col"
       >
         {/*This is for  Header */}
         <div className="flex justify-between items-center border-b pb-4">
@@ -379,7 +378,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                   disabled={!acceptedTerms}
                   className={`w-full py-3 rounded-lg font-medium transition cursor-pointer ${
                     acceptedTerms
-                      ? "bg-red-500 hover:bg-red-600 text-white"
+                      ? "bg-green-900 hover:bg-green-500 text-white"
                       : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
                 >

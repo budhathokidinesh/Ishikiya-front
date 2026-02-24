@@ -6,7 +6,7 @@ const RecommendedFood = () => {
     <div className="py-6 px-10 sm:px-4 md:px-6 lg:px-6">
       <div className="container mx-auto py-[2vh]">
         {/* Title for top seller  */}
-        <div className="text-2xl md:text-3xl font-bold text-center text-[#2e2e2e] lg:text-4xl">
+        <div className="text-2xl md:text-3xl font-bold text-center text-yellow-400 lg:text-4xl">
           Top <span className="text-red-400">Seller</span>
         </div>
         <div className="grid py-6 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4 items-center justify-items-center">
