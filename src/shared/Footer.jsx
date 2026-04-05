@@ -7,7 +7,7 @@ import { FaXTwitter } from "react-icons/fa6";
 const Footer = () => {
   return (
     <footer className="w-full bg-gradient-to-r from-[#142850] to-[#27496d] text-white py-10">
-      <div className="px-4 text-center space-y-6 w-full">
+      <div className="px-10 sm:px-4 md:px-6 lg:px-6 mx-auto text-center space-y-6">
         {/* Navigation Links */}
         <nav className="flex flex-wrap justify-center gap-6 text-lg font-semibold">
           <Link to="/aboutus" className="hover:text-yellow-400 transition">

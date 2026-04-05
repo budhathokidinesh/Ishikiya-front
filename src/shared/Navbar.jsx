@@ -76,7 +76,8 @@ const Navbar = () => {
               </Link>
             ) : (
               <Link to="/">
-                <img src="./logo.png" alt="" className="h-14 cursor-pointer" />
+                {/* <img src="./logo.png" alt="" className="h-14 cursor-pointer" /> */}
+                <p>Fish n Chips</p>
               </Link>
             )}
 

@@ -10,9 +10,11 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
+  width: 100%;
 }
-
-#root {
+.main-content {
   max-width: 1440px;
-  margin: 0 auto; /* centers content */
+  margin: 0 auto;
+  flex: 1;
+  width: 100%;
 }
