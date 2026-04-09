@@ -27,6 +27,7 @@
     "jspdf-autotable": "^5.0.2",
     "lodash": "^4.17.21",
     "lucide-react": "^0.511.0",
+    "openai": "^6.34.0",
     "react": "^19.0.0",
     "react-date-range": "^2.0.1",
     "react-datepicker": "^8.4.0",
