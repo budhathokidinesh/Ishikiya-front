@@ -11,10 +11,14 @@ body,
   margin: 0;
   padding: 0;
   width: 100%;
+  font-family: sans-serif;
 }
-.main-content {
-  max-width: 1440px;
-  margin: 0 auto;
-  flex: 1;
-  width: 100%;
+
+body {
+  background: linear-gradient(
+    180deg,
+    rgba(173, 216, 230, 0.5) 0%,
+    rgba(255, 255, 255, 0.7) 100%
+  );
+  min-height: 100vh;
 }

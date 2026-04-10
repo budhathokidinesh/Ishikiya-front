@@ -66,7 +66,7 @@ const MenuPage = () => {
     dispatch(fetchCart());
   };
   return (
-    <div className="pt-[12vh] px-8 sm:px-4 md:px-6">
+    <div className="pt-[12vh] px-8 sm:px-4 md:px-6 bg-[#8B9AA0]">
       <div className="container mx-auto py-8">
         <div className="p-5 mb-14">
           <div className="flex flex-wrap justify-center mb-8 gap-4">

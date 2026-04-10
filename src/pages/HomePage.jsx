@@ -6,7 +6,7 @@ import React from "react";
 
 const HomePage = () => {
   return (
-    <div>
+    <div className="bg-[#8B9AA0]">
       <Header />
       <br />
       <br />
