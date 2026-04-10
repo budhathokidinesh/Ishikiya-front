@@ -77,7 +77,7 @@ const Navbar = () => {
             ) : (
               <Link to="/">
                 {/* <img src="./logo.png" alt="" className="h-14 cursor-pointer" /> */}
-                <p>Fish n Chips</p>
+                <p className="text-xl font-bold tracking-wide">🌊Freshly</p>
               </Link>
             )}
 

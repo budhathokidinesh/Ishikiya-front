@@ -50,7 +50,7 @@ const Footer = () => {
 
         {/* Copyright */}
         <aside className="text-sm text-gray-300">
-          © {new Date().getFullYear()} Alkimos Beach Fish and Chips. All rights
+          © {new Date().getFullYear()} 🌊Freshly Fish and Chips. All rights
           reserved.
         </aside>
       </div>
