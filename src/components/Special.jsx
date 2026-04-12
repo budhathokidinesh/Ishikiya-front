@@ -1,126 +1,67 @@
 import React from "react";
+import { Link } from "react-router-dom";
+
+const specials = [
+  { img: "./fnc.jpg",  name: "Fish & Chips",     desc: "Today's catch — extra crispy batter, double-fried chips, served with mushy peas.", price: "$16", original: "$20", badge: "⚡ 20% Off" },
+  { img: "./bnc2.jpg", name: "Chippy Burger",     desc: "Beer-battered fish fillet in a brioche bun with tartare sauce and pickles.", price: "$14", original: "$18", badge: "🌟 Chef's Pick" },
+  { img: "./bnc3.jpg", name: "Seafood Platter",   desc: "A mix of prawns, calamari and fish goujons with dipping sauces.", price: "$22", original: "$28", badge: "🦐 Limited" },
+  { img: "./bnc4.jpg", name: "Meal Deal",         desc: "Any main + chips + a cold drink. The ultimate chippy combo for one.", price: "$18", original: "$24", badge: "🎉 Bundle" },
+];
 
 const Special = () => {
   return (
-    <div className="py-3 px-10 sm:px-4 md:px-6 lg:px-6">
-      <div className="container mx-auto py-[2vh]">
-        {/* Title for top seller  */}
-        <div className="text-2xl md:text-3xl font-bold text-center text-yellow-400 lg:text-4xl">
-          Today <span className="text-red-400">Special</span>
+    <section className="py-4 px-4 md:px-6">
+      <div className="container mx-auto max-w-6xl">
+        {/* Section heading */}
+        <div className="text-center mb-8">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-800">
+            Today&apos;s <span className="text-red-400">Specials</span>
+          </h2>
+          <p className="text-gray-500 text-sm mt-1">Limited-time deals — grab them while they last</p>
+          <div className="mx-auto mt-3 w-16 h-1 rounded-full bg-red-300" />
         </div>
-        <div className="grid py-6 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-4 items-center justify-items-center">
-          {/* Food card */}
 
-          <div className="card bg-base-100 w-60 shadow-sm h-[380px] flex flex-col transform transition duration-300 hover:scale-105 hover:cursor-pointer">
-            <figure className="h-40 w-full overflow-hidden">
-              <img
-                src="./fnc.jpg"
-                alt="Shoes"
-                className="h-full w-full object-cover"
-              />
-            </figure>
-            <div className=" flex flex-col flex-grow px-4 py-2 overflow-hidden h-56">
-              <h2 className="card-title text-lg text-center items-center text-blue-600">
-                Fish and Chips
-              </h2>
-              <p className="text-sm overflow-y-auto flex-grow my-1">
-                Fresh fish and chips.
-              </p>
-              <div className="card-actions justify-between mt-2">
-                <span className="text-xl font-semibold">Price: $20</span>
-                <button
-                  className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-2 text-sm rounded shadow transition-all duration-200 cursor-pointer"
-                  onClick={() => handleAddToCart(item)}
-                >
-                  Order Now
-                </button>
+        <div className="grid lg:grid-cols-4 md:grid-cols-2 sm:grid-cols-2 grid-cols-1 gap-6 justify-items-center">
+          {specials.map((item) => (
+            <div
+              key={item.name}
+              className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 w-full max-w-[260px] flex flex-col overflow-hidden border border-red-50"
+            >
+              {/* Image */}
+              <div className="relative h-44 overflow-hidden">
+                <img
+                  src={item.img}
+                  alt={item.name}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <span className="absolute top-3 left-3 bg-red-400 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">
+                  {item.badge}
+                </span>
+              </div>
+
+              {/* Body */}
+              <div className="flex flex-col flex-grow px-4 py-3">
+                <h3 className="font-bold text-gray-800 text-base mb-1">{item.name}</h3>
+                <p className="text-gray-500 text-xs leading-relaxed flex-grow line-clamp-3">{item.desc}</p>
+
+                {/* Footer */}
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-red-50">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-red-500 font-extrabold text-lg">{item.price}</span>
+                    <span className="text-gray-400 text-xs line-through">{item.original}</span>
+                  </div>
+                  <Link to="/menu">
+                    <button className="bg-red-400 hover:bg-red-500 active:scale-95 text-white text-xs font-bold px-4 py-2 rounded-full shadow transition-all duration-200 cursor-pointer">
+                      Order Now
+                    </button>
+                  </Link>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="card bg-base-100 w-60 shadow-sm h-[380px] flex flex-col transform transition duration-300 hover:scale-105 hover:cursor-pointer">
-            <figure className="h-40 w-full overflow-hidden">
-              <img
-                src="./bnc2.jpg"
-                alt="Shoes"
-                className="h-full w-full object-cover"
-              />
-            </figure>
-            <div className=" flex flex-col flex-grow px-4 py-2 overflow-hidden h-56">
-              <h2 className="card-title text-lg text-center items-center text-blue-600">
-                Beef Burger
-              </h2>
-              <p className="text-sm overflow-y-auto flex-grow my-1">
-                It is made from freshly grounded beef patty. Home made buns and
-                fresh lattuce. Please make sure what type of beef you want while
-                ordering food. THanks Lorem ipsum dolor sit amet consectetur
-                adipisicing elit. Aspernatur, voluptas.
-              </p>
-              <div className="card-actions justify-between mt-2">
-                <span className="text-xl font-semibold">Price: $20</span>
-                <button
-                  className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-2 text-sm rounded shadow transition-all duration-200 cursor-pointer"
-                  onClick={() => handleAddToCart(item)}
-                >
-                  Order Now
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="card bg-base-100 w-60 shadow-sm h-[380px] flex flex-col transform transition duration-300 hover:scale-105 hover:cursor-pointer">
-            <figure className="h-40 w-full overflow-hidden">
-              <img
-                src="./bnc3.jpg"
-                alt="Shoes"
-                className="h-full w-full object-cover"
-              />
-            </figure>
-            <div className=" flex flex-col flex-grow px-4 py-2 overflow-hidden h-56">
-              <h2 className="card-title text-lg text-center items-center text-blue-600">
-                Fry fish
-              </h2>
-              <p className="text-sm overflow-y-auto flex-grow my-1">
-                Best fish in town
-              </p>
-              <div className="card-actions justify-between mt-2">
-                <span className="text-xl font-semibold">Price: $20</span>
-                <button
-                  className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-2 text-sm rounded shadow transition-all duration-200 cursor-pointer"
-                  onClick={() => handleAddToCart(item)}
-                >
-                  Order Now
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="card bg-base-100 w-60 shadow-sm h-[380px] flex flex-col transform transition duration-300 hover:scale-105 hover:cursor-pointer">
-            <figure className="h-40 w-full overflow-hidden">
-              <img
-                src="./bnc4.jpg"
-                alt="Shoes"
-                className="h-full w-full object-cover"
-              />
-            </figure>
-            <div className=" flex flex-col flex-grow px-4 py-2 overflow-hidden h-56">
-              <h2 className="card-title text-lg text-center items-center text-blue-600">
-                Beer
-              </h2>
-              <p className="text-sm overflow-y-auto flex-grow my-1">
-                Chilled Fish
-              </p>
-              <div className="card-actions justify-between mt-2">
-                <span className="text-xl font-semibold">Price: $6</span>
-                <button
-                  className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-2 text-sm rounded shadow transition-all duration-200 cursor-pointer"
-                  onClick={() => handleAddToCart(item)}
-                >
-                  Order Now
-                </button>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

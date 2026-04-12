@@ -12,17 +12,17 @@ const PageNavigation = ({ title }) => {
         <li className="inline-flex items-center">
           <Link
             to="/"
-            className="inline-flex items-center text-blue-600 hover:underline font-medium"
+            className="inline-flex items-center text-amber-500 hover:text-amber-600 hover:underline font-medium"
           >
             Home
           </Link>
         </li>
         <li>
           <div className="flex items-center">
-            <HiChevronRight className="text-gray-400" />
+            <HiChevronRight className="text-amber-300" />
             <Link
               to="/menu"
-              className="ml-1 text-blue-600 hover:underline font-medium"
+              className="ml-1 text-amber-500 hover:text-amber-600 hover:underline font-medium"
             >
               Menu
             </Link>
@@ -30,8 +30,8 @@ const PageNavigation = ({ title }) => {
         </li>
         <li>
           <div className="flex items-center">
-            <HiChevronRight className="text-gray-400" />
-            <span className="ml-1 font-semibold text-yellow-500">{title}</span>
+            <HiChevronRight className="text-amber-300" />
+            <span className="ml-1 font-semibold text-gray-700">{title}</span>
           </div>
         </li>
       </ol>
