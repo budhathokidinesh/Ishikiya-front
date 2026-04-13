@@ -12,6 +12,7 @@ const SuccessPage = () => {
   const { isAuthenticated } = useSelector((state) => state.auth);
 
   useEffect(() => {
+    localStorage.removeItem("guestId");
     dispatch(resetCart());
     localStorage.removeItem("cartItems");
   }, [dispatch, sessionId]);

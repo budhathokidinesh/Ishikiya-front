@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  clearCart,
   resetCart,
   removeFromCart,
   updateCartItem,
@@ -78,7 +79,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
       setShowClearConfirm(true);
       return;
     }
-    dispatch(resetCart());
+    dispatch(clearCart()).finally(() => dispatch(resetCart()));
     setShowClearConfirm(false);
   };
 
@@ -113,9 +114,11 @@ const CartDrawer = ({ isOpen, onClose }) => {
       const response = await dispatch(placeOrder(orderData)).unwrap();
 
       if (response?.url) {
+        localStorage.removeItem("guestId");
         dispatch(resetCart());
         window.location.href = response.url;
       } else if (response?.order) {
+        localStorage.removeItem("guestId");
         dispatch(resetCart());
         onClose();
       }
