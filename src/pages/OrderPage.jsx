@@ -1,29 +1,57 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  changeOrderStatus,
-  fetchAllOrdersAdmin,
-} from "@/store/order/orderSlice";
+import { changeOrderStatus, fetchAllOrdersAdmin } from "@/store/order/orderSlice";
 import { useLocation } from "react-router-dom";
 import OrderPDFDownloader from "@/components/OrderPDFDownloader";
+import {
+  RefreshCw, AlertCircle, Loader2, ShoppingBag,
+  Phone, Calendar, CreditCard,
+} from "lucide-react";
 
+/* ── Status config ───────────────────────────────────────────── */
+const ORDER_STATUSES   = ["Order Placed", "Processing", "Ready", "Completed", "Cancelled"];
+const PAYMENT_STATUSES = ["Paid", "Pending", "Processing", "Failed", "Refunded"];
+
+const ORDER_BADGE = {
+  "Order Placed": "bg-amber-100 text-amber-700",
+  Processing:     "bg-blue-100 text-blue-700",
+  Ready:          "bg-teal-100 text-teal-700",
+  Completed:      "bg-green-100 text-green-700",
+  Cancelled:      "bg-red-100 text-red-600",
+};
+const PAYMENT_BADGE = {
+  Paid:       "bg-teal-100 text-teal-700",
+  Pending:    "bg-amber-100 text-amber-700",
+  Processing: "bg-blue-100 text-blue-700",
+  Failed:     "bg-red-100 text-red-600",
+  Refunded:   "bg-gray-100 text-gray-600",
+};
+
+const StatusSelect = ({ value, options, badge, disabled, onChange }) => (
+  <select
+    value={value}
+    disabled={disabled}
+    onChange={(e) => onChange(e.target.value)}
+    className={`text-[11px] font-bold px-2.5 py-1 rounded-full border-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-400 appearance-none ${badge[value] || "bg-gray-100 text-gray-600"} ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
+  >
+    {options.map((o) => <option key={o} value={o}>{o}</option>)}
+  </select>
+);
+
+const formatDate = (date) => date.toISOString().split("T")[0];
+
+/* ── Page ────────────────────────────────────────────────────── */
 const AdminOrderPage = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const dispatch = useDispatch();
-  const [updatingOrders, setUpdatingOrders] = useState({});
   const { orders, isLoading, error } = useSelector((state) => state.order);
-  const filter = searchParams.get("filter") || "All";
-  const startDateParam = searchParams.get("startDate");
-  const endDateParam = searchParams.get("endDate");
 
-  // FILTER STATES
-  const [statusFilter, setStatusFilter] = useState(filter);
+  const filterParam      = searchParams.get("filter")    || "All";
+  const startDateParam   = searchParams.get("startDate");
+  const endDateParam     = searchParams.get("endDate");
 
-  // Default to today's date range
+  const [statusFilter, setStatusFilter] = useState(filterParam);
   const [dateFilter, setDateFilter] = useState({
     startDate: startDateParam
       ? new Date(startDateParam + "T00:00:00")
@@ -32,332 +60,241 @@ const AdminOrderPage = () => {
       ? new Date(endDateParam + "T23:59:59")
       : new Date(new Date().setHours(23, 59, 59, 999)),
   });
+  const [updatingOrders, setUpdatingOrders] = useState({});
+
+  useEffect(() => { dispatch(fetchAllOrdersAdmin()); }, [dispatch]);
 
   useEffect(() => {
-    dispatch(fetchAllOrdersAdmin());
-  }, [dispatch]);
+    if (filterParam) setStatusFilter(filterParam);
+    if (startDateParam) setDateFilter((p) => ({ ...p, startDate: new Date(startDateParam + "T00:00:00") }));
+    if (endDateParam)   setDateFilter((p) => ({ ...p, endDate:   new Date(endDateParam   + "T23:59:59") }));
+  }, [filterParam, startDateParam, endDateParam]);
 
-  useEffect(() => {
-    if (filter) setStatusFilter(filter);
-    if (startDateParam)
-      setDateFilter((prev) => ({
-        ...prev,
-        startDate: new Date(startDateParam + "T00:00:00"),
-      }));
-    if (endDateParam)
-      setDateFilter((prev) => ({
-        ...prev,
-        endDate: new Date(endDateParam + "T23:59:59"),
-      }));
-  }, [filter, startDateParam, endDateParam]);
-  // Update order status handler (your existing code)
   const handleStatusChange = async (orderId, newStatus, statusType) => {
-    setUpdatingOrders((prev) => ({
-      ...prev,
-      [orderId]: { ...prev[orderId], [statusType]: true },
-    }));
+    setUpdatingOrders((p) => ({ ...p, [orderId]: { ...p[orderId], [statusType]: true } }));
     try {
-      const updatedData = {};
-      if (statusType === "order") {
-        updatedData.orderStatus = newStatus;
-      } else {
-        updatedData.paymentStatus = newStatus;
-      }
-
-      await dispatch(
-        changeOrderStatus({ orderId, updateData: updatedData })
-      ).unwrap();
-
-      dispatch({
-        type: "orders/updateOrderStatus",
-        payload: { orderId, updatedData },
-      });
-    } catch (error) {
-      console.error("Failed to update order status:", error);
+      const updatedData = statusType === "order"
+        ? { orderStatus: newStatus }
+        : { paymentStatus: newStatus };
+      await dispatch(changeOrderStatus({ orderId, updateData: updatedData })).unwrap();
+      dispatch({ type: "orders/updateOrderStatus", payload: { orderId, updatedData } });
+    } catch {
       dispatch(fetchAllOrdersAdmin());
     } finally {
-      setUpdatingOrders((prev) => ({
-        ...prev,
-        [orderId]: { ...prev[orderId], [statusType]: false },
-      }));
+      setUpdatingOrders((p) => ({ ...p, [orderId]: { ...p[orderId], [statusType]: false } }));
     }
   };
 
-  // Filter orders by date and status
   const filteredOrders = orders.filter((order) => {
-    const createdAt = new Date(order.createdAt);
-    const isWithinDateRange =
-      createdAt >= dateFilter.startDate && createdAt <= dateFilter.endDate;
-
-    const matchesStatus =
-      statusFilter === "All" ? true : order.orderStatus === statusFilter;
-
-    return isWithinDateRange && matchesStatus;
+    const d = new Date(order.createdAt);
+    const inRange = d >= dateFilter.startDate && d <= dateFilter.endDate;
+    const matchStatus = statusFilter === "All" || order.orderStatus === statusFilter;
+    return inRange && matchStatus;
   });
 
-  // Helper function to format date to YYYY-MM-DD for input value
-  const formatDate = (date) => date.toISOString().split("T")[0];
-  //this is for changing color
-  const getStatusColor = (status, type = "order") => {
-    if (type === "payment") {
-      switch (status) {
-        case "Paid":
-          return "bg-green-100 text-green-800";
-        case "Processing":
-          return "bg-blue-100 text-blue-800";
-        case "Pending":
-          return "bg-yellow-100 text-yellow-800";
-        case "Failed":
-          return "bg-red-100 text-red-800";
-        case "Refunded":
-          return "bg-purple-100 text-purple-800";
-        default:
-          return "bg-green-100 text-green-800";
-      }
-    } else {
-      switch (status) {
-        case "Completed":
-          return "bg-green-100 text-green-800";
-        case "Ready":
-          return "bg-blue-100 text-blue-800";
-        case "Processing":
-          return "bg-yellow-100 text-yellow-800";
-        case "Order Placed":
-          return "bg-orange-100 text-orange-800";
-        case "Cancelled":
-          return "bg-red-100 text-red-800";
-        default:
-          return "bg-gray-100 text-gray-800";
-      }
-    }
-  };
+  const STATUS_PILLS = ["All", ...ORDER_STATUSES];
+
   return (
-    <div className="pt-[12vh] px-4 max-w-6xl mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-800 mb-4">Admin Orders</h2>
-        <div className="flex space-x-2">
-          <Button
-            variant="outline"
-            onClick={() => dispatch(fetchAllOrdersAdmin())}
-          >
-            Refresh Orders
-          </Button>
+    <div
+      className="min-h-screen pt-[10vh] pb-20 px-4 md:px-6"
+      style={{ background: "linear-gradient(180deg,#fffbeb 0%,#fef3c7 40%,#fff 100%)" }}
+    >
+      <div className="container mx-auto max-w-6xl">
 
-          <OrderPDFDownloader orders={filteredOrders} />
-        </div>
-      </div>
-
-      {/* FILTER CONTROLS */}
-      <div className="flex  space-x-2 mb-6 items-center">
-        {/* Status Filter */}
-        <div className="text-center">
-          <label className="block text-sm  font-semibold text-gray-700 mb-1">
-            Order Status
-          </label>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="border rounded px-2 py-2 text-sm"
-          >
-            <option value="All">All</option>
-            <option value="Order Placed">Order Placed</option>
-            <option value="Processing">Processing</option>
-            <option value="Ready">Ready</option>
-            <option value="Completed">Completed</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
+        {/* Header */}
+        <div className="flex flex-wrap items-center justify-between gap-3 py-7">
+          <div>
+            <h1 className="text-2xl font-extrabold text-gray-800">
+              Admin <span className="text-amber-500">Orders</span>
+            </h1>
+            <p className="text-xs text-gray-400 mt-0.5">{filteredOrders.length} order{filteredOrders.length !== 1 ? "s" : ""} shown</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => dispatch(fetchAllOrdersAdmin())}
+              className="flex items-center gap-1.5 px-4 py-2 bg-white border border-amber-200 hover:bg-amber-50 text-amber-600 text-xs font-bold rounded-full shadow-sm transition"
+            >
+              <RefreshCw size={13} /> Refresh
+            </button>
+            <OrderPDFDownloader orders={filteredOrders} />
+          </div>
         </div>
 
-        {/* Date Filter */}
-        <div className="text-center">
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
-            Start Date
-          </label>
-          <input
-            type="date"
-            value={formatDate(dateFilter.startDate)}
-            max={formatDate(dateFilter.endDate)}
-            onChange={(e) =>
-              setDateFilter((prev) => ({
-                ...prev,
-                startDate: new Date(e.target.value + "T00:00:00"),
-              }))
-            }
-            className="border rounded px-2 py-2 text-sm"
-          />
-        </div>
-
-        <div className="text-center">
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
-            End Date
-          </label>
-          <input
-            type="date"
-            value={formatDate(dateFilter.endDate)}
-            min={formatDate(dateFilter.startDate)}
-            onChange={(e) =>
-              setDateFilter((prev) => ({
-                ...prev,
-                endDate: new Date(e.target.value + "T23:59:59"),
-              }))
-            }
-            className="border rounded px-2 py-2 text-sm"
-          />
-        </div>
-      </div>
-
-      {/* Render filtered orders */}
-      {isLoading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-      ) : error ? (
-        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              {/* Error icon */}
-              <svg
-                className="h-5 w-5 text-red-500"
-                viewBox="0 0 20 20"
-                fill="currentColor"
+        {/* Filters */}
+        <div className="bg-white rounded-2xl border border-amber-100 shadow-sm px-5 py-4 mb-5">
+          {/* Status pills */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {STATUS_PILLS.map((s) => (
+              <button
+                key={s}
+                onClick={() => setStatusFilter(s)}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition ${
+                  statusFilter === s
+                    ? "bg-amber-400 text-white shadow-sm"
+                    : "bg-amber-50 text-amber-600 hover:bg-amber-100"
+                }`}
               >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
+                {s}
+              </button>
+            ))}
+          </div>
+
+          {/* Date range */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Calendar size={13} className="text-amber-400 shrink-0" />
+              <span className="text-xs font-semibold text-gray-500">From</span>
+              <input
+                type="date"
+                value={formatDate(dateFilter.startDate)}
+                max={formatDate(dateFilter.endDate)}
+                onChange={(e) => setDateFilter((p) => ({ ...p, startDate: new Date(e.target.value + "T00:00:00") }))}
+                className="text-xs bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition"
+              />
             </div>
-            <div className="ml-3">
-              <p className="text-sm text-red-700">{error}</p>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-gray-500">To</span>
+              <input
+                type="date"
+                value={formatDate(dateFilter.endDate)}
+                min={formatDate(dateFilter.startDate)}
+                onChange={(e) => setDateFilter((p) => ({ ...p, endDate: new Date(e.target.value + "T23:59:59") }))}
+                className="text-xs bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 text-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition"
+              />
             </div>
           </div>
         </div>
-      ) : (
-        <Card className="shadow-lg border-0">
-          <CardContent className="p-0">
-            {/* Responsive wrapper */}
-            <div className="w-full overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Order ID
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Customer
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Total
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Order Status
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Payment Status
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredOrders.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={6}
-                        className="text-center py-8 text-gray-500 font-medium"
-                      >
-                        No orders found for selected filters.
-                      </td>
+
+        {/* Loading */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-24">
+            <Loader2 size={36} className="animate-spin text-amber-400" />
+          </div>
+        )}
+
+        {/* Error */}
+        {error && !isLoading && (
+          <div className="bg-white rounded-2xl border border-red-100 shadow-sm p-6 flex items-start gap-3">
+            <AlertCircle size={18} className="text-red-400 shrink-0 mt-0.5" />
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+
+        {/* Orders table */}
+        {!isLoading && !error && (
+          <div className="bg-white rounded-2xl border border-amber-100 shadow-sm overflow-hidden">
+            {filteredOrders.length === 0 ? (
+              <div className="py-20 text-center">
+                <span className="text-5xl block mb-3">🐟</span>
+                <p className="font-bold text-gray-700 mb-1">No orders found</p>
+                <p className="text-gray-400 text-sm">Try adjusting the filters above</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead>
+                    <tr className="border-b border-amber-50">
+                      {["Order", "Customer", "Items", "Total", "Order Status", "Payment", ""].map((h) => (
+                        <th key={h} className="px-4 py-3.5 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">
+                          {h}
+                        </th>
+                      ))}
                     </tr>
-                  ) : (
-                    filteredOrders.map((order) => (
-                      <tr
-                        key={order._id}
-                        className="hover:bg-gray-50 transition-colors"
-                      >
-                        <td className="px-4 py-4 whitespace-nowrap text-sm font-semibold text-gray-700">
-                          {order._id.slice(-6)}
-                        </td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {order.buyer?.name || order.guestInfo?.name || "N/A"}
-                          {(order.buyer?.phone || order.guestInfo?.phone) && (
-                            <div className="text-xs text-gray-400">
-                              {order.buyer?.phone || order.guestInfo?.phone}
+                  </thead>
+                  <tbody className="divide-y divide-amber-50">
+                    {filteredOrders.map((order) => {
+                      const name  = order.buyer?.name  || order.guestInfo?.name  || "Guest";
+                      const phone = order.buyer?.phone || order.guestInfo?.phone;
+                      const payStatus = order.payment?.status || order.paymentStatus || "Pending";
+                      return (
+                        <tr key={order._id} className="hover:bg-amber-50/40 transition">
+                          {/* Order ID + date */}
+                          <td className="px-4 py-3.5 whitespace-nowrap">
+                            <p className="text-xs font-black text-gray-700 font-mono">#{order._id.slice(-6).toUpperCase()}</p>
+                            <p className="text-[11px] text-gray-400 mt-0.5">
+                              {new Date(order.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                              {" · "}
+                              {new Date(order.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
+                            </p>
+                          </td>
+
+                          {/* Customer */}
+                          <td className="px-4 py-3.5">
+                            <p className="text-sm font-semibold text-gray-700 whitespace-nowrap">{name}</p>
+                            {phone && (
+                              <span className="flex items-center gap-1 text-[11px] text-gray-400 mt-0.5">
+                                <Phone size={10} /> {phone}
+                              </span>
+                            )}
+                          </td>
+
+                          {/* Items count */}
+                          <td className="px-4 py-3.5 whitespace-nowrap">
+                            <div className="flex items-center gap-1.5">
+                              <ShoppingBag size={12} className="text-amber-400" />
+                              <span className="text-xs font-semibold text-gray-600">
+                                {order.items?.length ?? 0} item{order.items?.length !== 1 ? "s" : ""}
+                              </span>
                             </div>
-                          )}
-                        </td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                          $ {order.totalAmount.toFixed(2)}
-                        </td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                          <select
-                            className={`border rounded p-1 ${getStatusColor(
-                              order.orderStatus,
-                              "order"
-                            )}`}
-                            value={order.orderStatus}
-                            onChange={(e) =>
-                              handleStatusChange(
-                                order._id,
-                                e.target.value,
-                                "order"
-                              )
-                            }
-                            disabled={updatingOrders[order._id]?.order}
-                          >
-                            <option value="Order Placed">Order Placed</option>
-                            <option value="Processing">Processing</option>
-                            <option value="Ready">Ready</option>
-                            <option value="Completed">Completed</option>
-                            <option value="Cancelled">Cancelled</option>
-                          </select>
-                        </td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                          <select
-                            className={`border rounded p-1 ${getStatusColor(
-                              order.payment?.status || order.paymentStatus,
-                              "payment"
-                            )}`}
-                            value={
-                              order.payment?.status ||
-                              order.paymentStatus ||
-                              "Completed"
-                            }
-                            onChange={(e) =>
-                              handleStatusChange(
-                                order._id,
-                                e.target.value,
-                                "payment"
-                              )
-                            }
-                            disabled={updatingOrders[order._id]?.payment}
-                          >
-                            <option value="Paid">Paid</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Processing">Processing</option>
-                            <option value="Failed">Failed</option>
-                            <option value="Refunded">Refunded</option>
-                          </select>
-                        </td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
-                          <button
-                            className="text-red-600 hover:text-red-900"
-                            onClick={() => alert("Implement your delete logic")}
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+                          </td>
+
+                          {/* Total */}
+                          <td className="px-4 py-3.5 whitespace-nowrap">
+                            <span className="text-sm font-extrabold text-amber-600">
+                              ${order.totalAmount.toFixed(2)}
+                            </span>
+                          </td>
+
+                          {/* Order status select */}
+                          <td className="px-4 py-3.5 whitespace-nowrap">
+                            <StatusSelect
+                              value={order.orderStatus}
+                              options={ORDER_STATUSES}
+                              badge={ORDER_BADGE}
+                              disabled={!!updatingOrders[order._id]?.order}
+                              onChange={(v) => handleStatusChange(order._id, v, "order")}
+                            />
+                            {updatingOrders[order._id]?.order && (
+                              <Loader2 size={11} className="animate-spin text-amber-400 ml-1 inline" />
+                            )}
+                          </td>
+
+                          {/* Payment status select */}
+                          <td className="px-4 py-3.5 whitespace-nowrap">
+                            <div className="flex items-center gap-1">
+                              <CreditCard size={11} className="text-gray-300 shrink-0" />
+                              <StatusSelect
+                                value={payStatus}
+                                options={PAYMENT_STATUSES}
+                                badge={PAYMENT_BADGE}
+                                disabled={!!updatingOrders[order._id]?.payment}
+                                onChange={(v) => handleStatusChange(order._id, v, "payment")}
+                              />
+                              {updatingOrders[order._id]?.payment && (
+                                <Loader2 size={11} className="animate-spin text-amber-400" />
+                              )}
+                            </div>
+                          </td>
+
+                          {/* Actions */}
+                          <td className="px-4 py-3.5 whitespace-nowrap">
+                            <button
+                              onClick={() => alert("Implement your delete logic")}
+                              className="text-[11px] font-bold text-red-400 hover:text-red-600 hover:bg-red-50 px-2.5 py-1 rounded-full transition"
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

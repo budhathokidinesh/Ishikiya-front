@@ -4,143 +4,198 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { User, Mail, Phone, Camera, Loader2, Save } from "lucide-react";
+
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 const ProfilePage = () => {
   const [image, setImage] = useState({});
   const [uploading, setUploading] = useState(false);
-  const [formData, setFormData] = useState({ name: "" });
+  const [formData, setFormData] = useState({ name: "", phone: "" });
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user, isLoading } = useSelector((state) => state.user);
 
-  //this is for setting user data initially if available
   React.useEffect(() => {
     dispatch(getUser());
   }, [dispatch]);
-  //this is for handling profile picture
+
+  React.useEffect(() => {
+    if (user) setFormData({ name: user.name || "", phone: user.phone || "" });
+  }, [user]);
+
   const handleImage = async (e) => {
     const file = e.target.files[0];
-    let formData = new FormData();
-    formData.append("image", file);
+    if (!file) return;
+    const fd = new FormData();
+    fd.append("image", file);
     setUploading(true);
-
     try {
       const { data } = await axios.post(
         `${BASE_URL}/api/v1/all/upload-image`,
-        formData
+        fd,
       );
+      setImage({ url: data.url, public_id: data.public_id });
+    } catch {
+      toast.error("Image upload failed.");
+    } finally {
       setUploading(false);
-      setImage({
-        url: data.url,
-        public_id: data.public_id,
-      });
-    } catch (error) {
-      console.log(error);
     }
   };
-  //Handle form data change (Only name)
+
   const handleOnChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  //submit profile update(only name and image)
+
   const handleOnSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-    const updatedData = {
-      name: formData.name,
-      imageUrl: image.url,
-      phone: formData.phone,
-    };
     try {
-      await dispatch(editUser(updatedData)).unwrap();
-      toast.success(
-        "Your profile updated successfully. Start ordering food now."
-      );
+      await dispatch(
+        editUser({
+          name: formData.name,
+          imageUrl: image.url,
+          phone: formData.phone,
+        }),
+      ).unwrap();
+      toast.success("Profile updated!");
       navigate("/menu");
-    } catch (error) {
-      console.error("Profile update failed", error);
+    } catch {
+      toast.error("Update failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
-  console.log(user);
+
+  const avatarSrc = image?.url || user?.profileImage || "pp.png";
+
   return (
-    <div className="profile">
-      <div className="register">
-        <div className="w-full mx-auto pt-[16vh] mb-4">
-          <form
-            onSubmit={handleOnSubmit}
-            className="ease-in duration-300 w-[88%] sm:w-max shadow-sm backdrop-blur-md bg-white/80 lg:w-max mx-auto items-center rounded-md px-8 py-5"
-          >
-            <label htmlFor="file-upload" className="custom-file-upload">
-              <img
-                src={image?.url || "pp.png"}
-                alt="Profile"
-                className="h-32 w-32 bg-contain rounded-full mx-auto cursor-pointer"
-              />
+    <div
+      className="min-h-screen flex items-center justify-center px-4 py-20"
+      style={{
+        background: "linear-gradient(180deg,#fffbeb 0%,#fef3c7 40%,#fff 100%)",
+      }}
+    >
+      <div className="w-full max-w-sm">
+        <div className="bg-white rounded-3xl shadow-sm border border-amber-100 p-8">
+          {/* Avatar */}
+          <div className="flex flex-col items-center mb-7">
+            <label
+              htmlFor="avatar-upload"
+              className="cursor-pointer relative group"
+            >
+              <div className="relative w-20 h-20">
+                {uploading ? (
+                  <div className="w-20 h-20 rounded-full bg-amber-50 border-2 border-dashed border-amber-300 flex items-center justify-center">
+                    <Loader2
+                      size={22}
+                      className="animate-spin text-amber-400"
+                    />
+                  </div>
+                ) : (
+                  <img
+                    src={avatarSrc}
+                    alt="avatar"
+                    className="w-20 h-20 rounded-full object-cover ring-4 ring-amber-100 group-hover:brightness-90 transition"
+                  />
+                )}
+                <span className="absolute bottom-0 right-0 w-6 h-6 bg-amber-400 rounded-full border-2 border-white flex items-center justify-center">
+                  <Camera size={11} className="text-white" />
+                </span>
+              </div>
             </label>
             <input
               type="file"
-              label="Image"
-              name="myFile"
-              id="file-upload"
+              id="avatar-upload"
               className="hidden"
               accept=".jpg,.png,.jpeg"
               onChange={handleImage}
             />
+            <p className="font-bold text-gray-800 text-sm mt-3">
+              {user?.name || "—"}
+            </p>
+            <p className="text-xs text-gray-400">{user?.email}</p>
+          </div>
 
-            {/* Name Field */}
-            <div className="mb-3">
-              <label className="block text-gray-700 text-sm mb-2">Name</label>
-              <input
-                type="text"
-                name="name"
-                placeholder="Please type your name"
-                required
-                value={formData.name}
-                onChange={handleOnChange}
-                className="shadow-sm bg-white appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              />
+          <div className="border-t border-amber-50 mb-6" />
+
+          {/* Form */}
+          <form onSubmit={handleOnSubmit} className="space-y-4">
+            <div>
+              <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+                Name
+              </label>
+              <div className="relative">
+                <User
+                  size={13}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-amber-400"
+                />
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  placeholder="Your full name"
+                  value={formData.name}
+                  onChange={handleOnChange}
+                  className="w-full pl-9 pr-4 py-2.5 text-sm bg-amber-50 border border-amber-200 rounded-xl text-gray-700 placeholder-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition"
+                />
+              </div>
             </div>
 
-            {/* Email (Disabled) */}
-            <div className="mb-3">
-              <label className="block text-gray-700 text-sm mb-2">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={user?.email || ""}
-                disabled
-                className="shadow-sm bg-gray-100 appearance-none border rounded w-full py-2 px-3 text-gray-700 cursor-not-allowed"
-              />
-            </div>
-            {/* This is for phone  */}
-            <div className="mb-3">
-              <label className="block text-gray-700 text-sm mb-2">Phone</label>
-              <input
-                type="number"
-                name="phone"
-                onChange={handleOnChange}
-                value={formData.phone}
-                className="shadow-sm bg-white appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              />
+            <div>
+              <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+                Email
+              </label>
+              <div className="relative">
+                <Mail
+                  size={13}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-300"
+                />
+                <input
+                  type="email"
+                  value={user?.email || ""}
+                  disabled
+                  className="w-full pl-9 pr-4 py-2.5 text-sm bg-gray-50 border border-gray-100 rounded-xl text-gray-400 cursor-not-allowed"
+                />
+              </div>
             </div>
 
-            {/* Submit Button */}
+            <div>
+              <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+                Phone
+              </label>
+              <div className="relative">
+                <Phone
+                  size={13}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-amber-400"
+                />
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Your phone number"
+                  value={formData.phone}
+                  onChange={handleOnChange}
+                  className="w-full pl-9 pr-4 py-2.5 text-sm bg-amber-50 border border-amber-200 rounded-xl text-gray-700 placeholder-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition"
+                />
+              </div>
+            </div>
+
             <button
               type="submit"
-              disabled={loading || isLoading}
-              className={`w-full px-8 py-2 text-xl font-medium text-white rounded-full mt-3 mb-2 cursor-pointer ${
-                loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-red-400 hover:shadow-xl active:scale-90 shadow-md transition duration-150"
-              }`}
+              disabled={loading || isLoading || uploading}
+              className="w-full flex items-center justify-center gap-2 py-2.5 bg-amber-400 hover:bg-amber-500 disabled:bg-amber-200 active:scale-95 text-white text-sm font-bold rounded-full shadow transition mt-1"
             >
-              {loading ? "Updating profile..." : "Update Profile"}
+              {loading ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" /> Saving…
+                </>
+              ) : (
+                <>
+                  <Save size={14} /> Save Changes
+                </>
+              )}
             </button>
           </form>
         </div>

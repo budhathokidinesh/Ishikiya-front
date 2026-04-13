@@ -1,85 +1,48 @@
-//I need to fix this one as well
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FiPlus, FiMinus, FiTrash2, FiAlertTriangle } from "react-icons/fi";
 import {
-  clearCart,
+  resetCart,
   removeFromCart,
   updateCartItem,
 } from "@/store/cart/cartSlice";
 import { placeOrder } from "@/store/order/orderSlice";
 import { getOrCreateGuestId } from "@/utils/guestId";
+import {
+  X,
+  Plus,
+  Minus,
+  Trash2,
+  ShoppingCart,
+  User,
+  Mail,
+  Phone,
+  ChevronLeft,
+  AlertTriangle,
+  CreditCard,
+  LogIn,
+  Loader2,
+} from "lucide-react";
+
+const guestInputClass =
+  "w-full pl-9 pr-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-sm text-gray-800 placeholder-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition";
 
 const CartDrawer = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
   const { cartItems, totalPrice } = useSelector((state) => state.cart);
+  const { user } = useSelector((state) => state.auth);
+
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const { user } = useSelector((state) => state.auth);
   const [isGuestMode, setIsGuestMode] = useState(false);
-
-  //this is for checkout session for guest user
+  const [checkingOut, setCheckingOut] = useState(false);
   const [guestInfo, setGuestInfo] = useState({
     name: "",
     email: "",
     phone: "",
   });
 
-  //this is for handling in checkout
-  const handleOnCheckout = async () => {
-    if (cartItems.length === 0) {
-      alert("Your cart is empty");
-      return;
-    }
-
-    if (!acceptedTerms) {
-      alert("You must accept the Terms and Conditions before proceeding");
-      return;
-    }
-
-    if (!user) {
-      if (!guestInfo?.name || !guestInfo?.email || !guestInfo?.phone) {
-        alert(
-          "Please fill in your name, email, and phone to proceed as guest."
-        );
-        return;
-      }
-    }
-
-    try {
-      const orderData = {
-        cart: cartItems.map((item) => ({
-          foodId: item.food._id,
-          quantity: item.quantity,
-        })),
-        paymentMethod: "Stripe",
-      };
-
-      if (!user) {
-        orderData.guestId = getOrCreateGuestId(); // make sure this returns a unique ID
-        orderData.guestInfo = guestInfo; // ✅ Add guestInfo explicitly
-      }
-
-      const response = await dispatch(placeOrder(orderData)).unwrap();
-
-      if (response?.url) {
-        dispatch(clearCart());
-        window.location.href = response.url; // redirect to Stripe Checkout
-      } else if (response?.order) {
-        alert("Order placed successfully!");
-        dispatch(clearCart());
-        onClose();
-      } else {
-        throw new Error("Unexpected response format");
-      }
-    } catch (error) {
-      console.error("Checkout error:", error);
-      alert(error.message || "Payment processing failed");
-    }
-  };
-
   const drawerRef = useRef(null);
-  //This is for closing cart drawer while clicking outside without any re-render the dom
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
@@ -91,304 +54,420 @@ const CartDrawer = ({ isOpen, onClose }) => {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen, onClose]);
 
-  //this is for handling increasing quantity
-  const handleIncrease = (foodId, currentQty) => {
-    dispatch(updateCartItem({ foodId, quantity: currentQty + 1 }));
-  };
-
-  //this is for decreasing the quantity
-  const handleDecrease = (foodId, currentQty) => {
-    if (currentQty > 1) {
-      dispatch(updateCartItem({ foodId, quantity: currentQty - 1 }));
+  // reset state when closed
+  useEffect(() => {
+    if (!isOpen) {
+      setShowClearConfirm(false);
+      setIsGuestMode(false);
+      setAcceptedTerms(false);
     }
-  };
+  }, [isOpen]);
 
-  //this is for removing items
-  const handleRemove = (foodId) => {
-    dispatch(removeFromCart({ foodId }));
+  const handleIncrease = (foodId, qty) =>
+    dispatch(updateCartItem({ foodId, quantity: qty + 1 }));
+  const handleDecrease = (foodId, qty) => {
+    if (qty > 1) dispatch(updateCartItem({ foodId, quantity: qty - 1 }));
   };
-  //this is for clearing the entire cart
+  const handleRemove = (foodId) => dispatch(removeFromCart({ foodId }));
+
   const handleClearCart = () => {
     if (!showClearConfirm) {
       setShowClearConfirm(true);
       return;
     }
-    dispatch(clearCart());
+    dispatch(resetCart());
     setShowClearConfirm(false);
   };
 
+  const guestReady = guestInfo.name && guestInfo.email && guestInfo.phone;
+  const canCheckout = user || (isGuestMode && guestReady);
+
+  const handleOnCheckout = async () => {
+    if (!cartItems.length) {
+      return;
+    }
+    if (!acceptedTerms) {
+      return;
+    }
+    if (!user && !guestReady) {
+      return;
+    }
+
+    setCheckingOut(true);
+    try {
+      const orderData = {
+        cart: cartItems.map((item) => ({
+          foodId: item.food._id,
+          quantity: item.quantity,
+        })),
+        paymentMethod: "Stripe",
+      };
+      if (!user) {
+        orderData.guestId = getOrCreateGuestId();
+        orderData.guestInfo = guestInfo;
+      }
+
+      const response = await dispatch(placeOrder(orderData)).unwrap();
+
+      if (response?.url) {
+        dispatch(resetCart());
+        window.location.href = response.url;
+      } else if (response?.order) {
+        dispatch(resetCart());
+        onClose();
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+    } finally {
+      setCheckingOut(false);
+    }
+  };
+
   if (!isOpen) return null;
-  console.log(cartItems, "Cart Items");
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex justify-end z-50">
+    <div
+      className="fixed inset-0 z-50 flex justify-end"
+      style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(2px)" }}
+    >
       <div
         ref={drawerRef}
-        className="bg-blue-600 w-full sm:w-[500px] p-6 shadow-lg h-full flex flex-col"
+        className="w-full sm:w-[420px] h-full bg-white flex flex-col shadow-2xl"
+        style={{ animation: "slideIn 0.25s ease-out" }}
       >
-        {/*This is for  Header */}
-        <div className="flex justify-between items-center border-b pb-4">
-          <h2 className="text-2xl font-bold">Your Shopping Cart</h2>
+        {/* ── Header ─────────────────────────────────────── */}
+        <div
+          className="shrink-0 px-5 py-4 flex items-center justify-between border-b border-amber-100"
+          style={{ background: "linear-gradient(135deg,#92400e,#d97706)" }}
+        >
+          <div className="flex items-center gap-2.5">
+            <ShoppingCart size={20} className="text-amber-200" />
+            <div>
+              <h2 className="text-white font-extrabold text-base leading-tight">
+                Your Cart
+              </h2>
+              <p className="text-amber-200 text-[11px]">
+                {cartItems.length} {cartItems.length === 1 ? "item" : "items"}
+              </p>
+            </div>
+          </div>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-red-500 text-2xl cursor-pointer"
+            className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition"
           >
-            &times;
+            <X size={16} />
           </button>
         </div>
 
-        {/*This is for Cart Items */}
-        <div className="flex-grow overflow-y-auto py-4">
-          {cartItems.length > 0 ? (
-            <div className="space-y-4">
-              {cartItems.map((item) => (
+        {/* ── Items ──────────────────────────────────────── */}
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-amber-50/40">
+          {cartItems.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center gap-4 text-center py-20">
+              <div className="w-20 h-20 rounded-full bg-amber-100 flex items-center justify-center text-4xl">
+                🐟
+              </div>
+              <div>
+                <p className="font-bold text-gray-700 text-base">
+                  Your cart is empty
+                </p>
+                <p className="text-gray-400 text-sm mt-1">
+                  Add some crispy goodness!
+                </p>
+              </div>
+              <button
+                onClick={onClose}
+                className="mt-2 px-6 py-2 bg-amber-400 hover:bg-amber-500 text-white text-sm font-bold rounded-full shadow transition"
+              >
+                Browse Menu
+              </button>
+            </div>
+          ) : (
+            cartItems.map((item) => (
+              <div
+                key={item.food?._id}
+                className="bg-white rounded-2xl border border-amber-100 shadow-sm p-3 flex gap-3"
+              >
+                {/* Image */}
                 <div
-                  key={item.food?._id}
-                  className="flex gap-4 p-3 border rounded-lg hover:shadow-2xl transition-all"
+                  className="w-18 h-18 shrink-0 rounded-xl overflow-hidden bg-amber-50"
+                  style={{ width: 72, height: 72 }}
                 >
                   <img
                     src={item.food?.imageUrl}
                     alt={item.food?.title}
-                    className="w-20 h-20 object-cover rounded"
+                    className="w-full h-full object-cover"
                   />
+                </div>
 
-                  <div className="flex-grow">
-                    <div className="flex justify-between">
-                      <h3 className="font-medium">{item.food?.title}</h3>
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-1">
+                    <h3 className="font-bold text-gray-800 text-sm leading-snug line-clamp-1">
+                      {item.food?.title}
+                    </h3>
+                    <button
+                      onClick={() => handleRemove(item.food?._id)}
+                      className="shrink-0 w-6 h-6 rounded-full hover:bg-red-50 flex items-center justify-center text-gray-400 hover:text-red-400 transition"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+
+                  <p className="text-amber-500 font-bold text-sm mt-0.5">
+                    ${item.food?.price?.toFixed(2)}
+                    <span className="text-gray-400 font-normal text-xs">
+                      {" "}
+                      each
+                    </span>
+                  </p>
+
+                  <div className="flex items-center justify-between mt-2">
+                    {/* Qty control */}
+                    <div className="flex items-center border border-amber-200 rounded-full overflow-hidden bg-amber-50">
                       <button
-                        onClick={() => handleRemove(item.food?._id)}
-                        className="text-red-400 hover:text-red-600 cursor-pointer"
+                        onClick={() =>
+                          handleDecrease(item.food?._id, item.quantity)
+                        }
+                        disabled={item.quantity <= 1}
+                        className="w-7 h-7 flex items-center justify-center text-amber-600 hover:bg-amber-100 disabled:opacity-30 transition"
                       >
-                        <FiTrash2 size={16} />
+                        <Minus size={12} />
+                      </button>
+                      <span className="px-2.5 text-sm font-bold text-gray-800 min-w-[1.5rem] text-center">
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() =>
+                          handleIncrease(item.food?._id, item.quantity)
+                        }
+                        className="w-7 h-7 flex items-center justify-center text-amber-600 hover:bg-amber-100 transition"
+                      >
+                        <Plus size={12} />
                       </button>
                     </div>
 
-                    <p className="text-gray-600 text-sm mt-1">
-                      ${item.food?.price.toFixed(2)} each
-                    </p>
-
-                    <div className="flex items-center justify-between mt-2">
-                      <div className="flex items-center border rounded">
-                        <button
-                          onClick={() =>
-                            handleDecrease(item.food?._id, item.quantity)
-                          }
-                          className="px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
-                          disabled={item.quantity <= 1}
-                        >
-                          <FiMinus size={14} />
-                        </button>
-                        <span className="px-3">{item.quantity}</span>
-                        <button
-                          onClick={() =>
-                            handleIncrease(item.food?._id, item.quantity)
-                          }
-                          className="px-2 py-1 text-gray-600 hover:bg-gray-100 cursor-pointer"
-                        >
-                          <FiPlus size={14} />
-                        </button>
-                      </div>
-
-                      <p className="font-medium">
-                        ${(item.food?.price * item.quantity).toFixed(2)}
-                      </p>
-                    </div>
+                    <span className="font-extrabold text-gray-800 text-sm">
+                      ${(item.food?.price * item.quantity).toFixed(2)}
+                    </span>
                   </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="h-full flex items-center justify-center">
-              <p className="text-gray-500 text-center">
-                Your cart is empty
-                <br />
-                <span className="text-sm">
-                  Start adding some delicious items!
-                </span>
-              </p>
-            </div>
+              </div>
+            ))
           )}
         </div>
 
-        {/* This is for Footer */}
+        {/* ── Footer ─────────────────────────────────────── */}
         {cartItems.length > 0 && (
-          <div className="border-t pt-4 space-y-4">
-            <div className="flex justify-between mb-2">
-              <span>Subtotal</span>
-              <span>${totalPrice?.toFixed(2)}</span>
+          <div className="shrink-0 border-t border-amber-100 bg-white px-5 py-4 space-y-4">
+            {/* Order summary */}
+            <div className="bg-amber-50 rounded-2xl px-4 py-3 space-y-2">
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Subtotal</span>
+                <span>${totalPrice?.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Delivery</span>
+                <span className="text-teal-600 font-semibold">Free</span>
+              </div>
+              <div className="flex justify-between font-extrabold text-gray-800 text-base border-t border-amber-200 pt-2 mt-1">
+                <span>Total</span>
+                <span className="text-amber-600">
+                  ${totalPrice?.toFixed(2)}
+                </span>
+              </div>
             </div>
-            <div className="flex justify-between mb-4">
-              <span>Delivery Fee</span>
-              <span>$0.00</span>
-            </div>
-            <div className="flex justify-between font-bold text-lg border-t pt-2 mb-4">
-              <span>Total</span>
-              <span>${totalPrice?.toFixed(2)}</span>
-            </div>
-            {/* This is for clear confirmation  */}
+
+            {/* Clear confirm */}
             {showClearConfirm && (
-              <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
-                <div className="flex items-start">
-                  <FiAlertTriangle className="text-yellow-500 mt-0.5 mr-2 flex-shrink-0" />
-                  <div>
-                    <p className="font-medium">Clear your cart?</p>
-                    <p className="text-sm text-gray-600">
-                      This will remove all items permanently.
-                    </p>
-                    <div className="flex gap-2 mt-2">
-                      <button
-                        onClick={handleClearCart}
-                        className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-sm rounded cursor-pointer"
-                      >
-                        Confirm Clear
-                      </button>
-                      <button
-                        onClick={() => setShowClearConfirm(false)}
-                        className="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm rounded cursor-pointer"
-                      >
-                        Cancel
-                      </button>
-                    </div>
+              <div className="bg-red-50 border border-red-200 rounded-2xl p-3 flex items-start gap-2.5">
+                <AlertTriangle
+                  size={16}
+                  className="text-red-400 shrink-0 mt-0.5"
+                />
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-red-700">
+                    Clear entire cart?
+                  </p>
+                  <p className="text-xs text-red-500 mt-0.5">
+                    This removes all items permanently.
+                  </p>
+                  <div className="flex gap-2 mt-2">
+                    <button
+                      onClick={handleClearCart}
+                      className="px-3 py-1.5 bg-red-400 hover:bg-red-500 text-white text-xs font-bold rounded-full transition"
+                    >
+                      Yes, clear it
+                    </button>
+                    <button
+                      onClick={() => setShowClearConfirm(false)}
+                      className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 text-xs font-semibold rounded-full hover:bg-gray-50 transition"
+                    >
+                      Cancel
+                    </button>
                   </div>
                 </div>
               </div>
             )}
 
-            <div className="flex flex-col gap-2">
-              <button
-                onClick={handleClearCart}
-                className={`w-full py-3 rounded-lg font-medium transition flex items-center justify-center gap-2 cursor-pointer ${
-                  showClearConfirm
-                    ? "bg-gray-200 hover:bg-gray-300 text-gray-800"
-                    : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                }`}
-              >
-                <FiTrash2 />
-                {showClearConfirm ? "Cancel" : "Clear Cart"}
-              </button>
-
-              {/* This is for guest user  */}
-              {!user && !isGuestMode && (
-                <div className="flex flex-col gap-2">
-                  <button
-                    onClick={() => setIsGuestMode(true)}
-                    className="w-full py-3 rounded-lg font-medium bg-blue-500 hover:bg-blue-600 text-white cursor-pointer"
-                  >
-                    Checkout as Guest
-                  </button>
-                  {cartItems.length > 0 && (
-                    <button
-                      onClick={() => {
-                        window.location.href = `/login?redirect=cart`;
-                      }}
-                      className="w-full py-3 rounded-lg font-medium bg-green-300 hover:bg-green-700 text-black hover:text-white cursor-pointer"
-                    >
-                      Login & Checkout
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {/* This is conditionally showing guest form  */}
-              {!user && isGuestMode && (
-                <div className="space-y-2">
-                  <input
-                    type="text"
-                    placeholder="Your Name"
-                    value={guestInfo.name}
-                    onChange={(e) =>
-                      setGuestInfo({ ...guestInfo, name: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border rounded"
-                    required
-                  />
-                  <input
-                    type="email"
-                    placeholder="Your Email"
-                    value={guestInfo.email}
-                    onChange={(e) =>
-                      setGuestInfo({ ...guestInfo, email: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border rounded"
-                    required
-                  />
-                  <input
-                    type="tel"
-                    placeholder="Phone Number"
-                    value={guestInfo.phone}
-                    onChange={(e) =>
-                      setGuestInfo({ ...guestInfo, phone: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border rounded"
-                    required
-                  />
+            {/* Guest form */}
+            {!user && isGuestMode && (
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2 mb-1">
                   <button
                     onClick={() => setIsGuestMode(false)}
-                    className="text-sm text-blue-500 hover:underline"
+                    className="text-amber-500 hover:text-amber-600"
                   >
-                    Go back to options
+                    <ChevronLeft size={16} />
                   </button>
+                  <p className="text-sm font-bold text-gray-700">
+                    Guest details
+                  </p>
                 </div>
-              )}
+                {[
+                  {
+                    icon: User,
+                    type: "text",
+                    name: "name",
+                    placeholder: "Full name",
+                  },
+                  {
+                    icon: Mail,
+                    type: "email",
+                    name: "email",
+                    placeholder: "Email address",
+                  },
+                  {
+                    icon: Phone,
+                    type: "tel",
+                    name: "phone",
+                    placeholder: "Phone number",
+                  },
+                ].map(({ icon: Icon, type, name, placeholder }) => (
+                  <div key={name} className="relative">
+                    <Icon
+                      size={14}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-amber-400"
+                    />
+                    <input
+                      type={type}
+                      placeholder={placeholder}
+                      value={guestInfo[name]}
+                      onChange={(e) =>
+                        setGuestInfo({ ...guestInfo, [name]: e.target.value })
+                      }
+                      className={guestInputClass}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
 
-              {/* This is for terms and conditions  */}
-              {(user ||
-                (isGuestMode &&
-                  guestInfo.name &&
-                  guestInfo.email &&
-                  guestInfo.phone)) && (
-                <div className="flex items-center gap-2">
+            {/* Auth / guest CTA */}
+            {!user && !isGuestMode && (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setIsGuestMode(true)}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs font-bold rounded-full transition"
+                >
+                  <ShoppingCart size={14} /> Guest Checkout
+                </button>
+                <button
+                  onClick={() => {
+                    window.location.href = "/login?redirect=cart";
+                  }}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-amber-400 hover:bg-amber-500 text-white text-xs font-bold rounded-full shadow transition"
+                >
+                  <LogIn size={14} /> Login & Pay
+                </button>
+              </div>
+            )}
+
+            {/* Terms */}
+            {canCheckout && (
+              <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                <div className="relative mt-0.5">
                   <input
                     type="checkbox"
                     id="acceptTerms"
                     checked={acceptedTerms}
                     onChange={(e) => setAcceptedTerms(e.target.checked)}
-                    className="w-4 h-4 mt-0.5"
+                    className="sr-only"
                   />
-                  <label
-                    htmlFor="acceptTerms"
-                    className="text-sm text-gray-700"
+                  <div
+                    className={`w-4 h-4 rounded border-2 flex items-center justify-center transition ${
+                      acceptedTerms
+                        ? "bg-amber-400 border-amber-400"
+                        : "border-amber-300 bg-white"
+                    }`}
                   >
-                    I accept the{" "}
-                    <a
-                      href="/order-policy"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      Terms and Conditions
-                    </a>
-                  </label>
+                    {acceptedTerms && (
+                      <span className="text-white text-[10px] font-bold">
+                        ✓
+                      </span>
+                    )}
+                  </div>
                 </div>
+                <span className="text-xs text-gray-600 leading-relaxed">
+                  I agree to the{" "}
+                  <a
+                    href="/order-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-amber-500 hover:underline font-semibold"
+                  >
+                    Terms & Conditions
+                  </a>
+                </span>
+              </label>
+            )}
+
+            {/* Action buttons */}
+            <div className="flex gap-2">
+              {!showClearConfirm && (
+                <button
+                  onClick={handleClearCart}
+                  className="flex items-center justify-center gap-1.5 px-4 py-2.5 border-2 border-amber-200 text-amber-600 text-xs font-bold rounded-full hover:bg-amber-50 transition"
+                >
+                  <Trash2 size={13} /> Clear
+                </button>
               )}
 
-              {/* This is for process to checkout  */}
-              {(user ||
-                (isGuestMode &&
-                  guestInfo.name &&
-                  guestInfo.email &&
-                  guestInfo.phone)) && (
+              {canCheckout && (
                 <button
                   onClick={handleOnCheckout}
-                  disabled={!acceptedTerms}
-                  className={`w-full py-3 rounded-lg font-medium transition cursor-pointer ${
-                    acceptedTerms
-                      ? "bg-green-900 hover:bg-green-500 text-white"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  disabled={!acceptedTerms || checkingOut}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-bold shadow transition ${
+                    acceptedTerms && !checkingOut
+                      ? "bg-amber-400 hover:bg-amber-500 active:scale-95 text-white"
+                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
                   }`}
                 >
-                  Proceed to Checkout
+                  {checkingOut ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" /> Processing…
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard size={16} /> Checkout · $
+                      {totalPrice?.toFixed(2)}
+                    </>
+                  )}
                 </button>
               )}
             </div>
           </div>
         )}
       </div>
+
+      <style>{`
+        @keyframes slideIn {
+          from { transform: translateX(100%); }
+          to   { transform: translateX(0); }
+        }
+      `}</style>
     </div>
   );
 };

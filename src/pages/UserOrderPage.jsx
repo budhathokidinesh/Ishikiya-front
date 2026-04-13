@@ -1,218 +1,261 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrderHistory } from "@/store/order/orderSlice";
 import { Link } from "react-router-dom";
 import ReviewForm from "@/components/ReviewForm";
-
 import GenerateReceiptPDF from "@/utils/GenerateReceiptPDF";
 import Receipt from "@/components/Receipt";
+import {
+  RefreshCw, ShoppingBag, Download, ChevronDown,
+  ChevronUp, Loader2, AlertCircle, CreditCard, Hash,
+} from "lucide-react";
+
+const PAYMENT_STATUS = {
+  Paid:       { cls: "bg-teal-100 text-teal-700",    dot: "bg-teal-500"   },
+  Pending:    { cls: "bg-amber-100 text-amber-700",  dot: "bg-amber-400"  },
+  Processing: { cls: "bg-blue-100 text-blue-700",    dot: "bg-blue-500"   },
+  Failed:     { cls: "bg-red-100 text-red-600",      dot: "bg-red-500"    },
+  Refunded:   { cls: "bg-gray-100 text-gray-600",    dot: "bg-gray-400"   },
+};
+
+const ORDER_STATUS = {
+  Pending:    { cls: "bg-amber-50 text-amber-600 border border-amber-200"   },
+  Confirmed:  { cls: "bg-blue-50 text-blue-600 border border-blue-200"     },
+  Preparing:  { cls: "bg-orange-50 text-orange-600 border border-orange-200"},
+  Delivered:  { cls: "bg-teal-50 text-teal-600 border border-teal-200"     },
+  Cancelled:  { cls: "bg-red-50 text-red-500 border border-red-200"        },
+};
+
+const StatusBadge = ({ label, map, fallback = "bg-gray-100 text-gray-600" }) => {
+  const cfg = map[label] || { cls: fallback, dot: "bg-gray-400" };
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${cfg.cls}`}>
+      {cfg.dot && <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />}
+      {label}
+    </span>
+  );
+};
 
 const UserOrderPage = () => {
   const dispatch = useDispatch();
   const { orders, isLoading, error } = useSelector((state) => state.order);
+  const [expanded, setExpanded] = useState({});
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    //this is for initial fetch
-    dispatch(fetchOrderHistory());
-  }, [dispatch]);
+  useEffect(() => { dispatch(fetchOrderHistory()); }, [dispatch]);
 
-  const handleRefresh = () => {
-    dispatch(fetchOrderHistory());
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    dispatch(fetchOrderHistory()).finally(() => setRefreshing(false));
   };
-  console.log(orders, "Orders");
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Paid":
-        return "bg-green-100 text-green-800";
-      case "Pending":
-        return "bg-orange-100 text-orange-800";
-      case "Processing":
-        return "bg-yellow-100 text-yellow-800";
-      case "Failed":
-        return "bg-red-100 text-red-800";
-      case "Refunded":
-        return "bg-gray-100 text-gray-700";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-  //this is for generating the receipt
   const handleDownloadReceipt = (order) => {
-    GenerateReceiptPDF(order, Receipt).catch((err) => {
-      console.error("Error generating PDF:", err);
-    });
+    GenerateReceiptPDF(order, Receipt).catch((err) => console.error(err));
   };
 
-  if (isLoading) {
+  const toggleExpand = (id) =>
+    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  const sorted = [...(orders ?? [])].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
+
+  /* ── Loading ──────────────────────────────────────── */
+  if (isLoading && !orders?.length) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: "linear-gradient(180deg,#fffbeb 0%,#fef3c7 40%,#fff 100%)" }}
+      >
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 size={40} className="animate-spin text-amber-400" />
+          <p className="text-gray-400 text-sm">Loading your orders…</p>
+        </div>
       </div>
     );
   }
 
+  /* ── Error ────────────────────────────────────────── */
   if (error) {
     return (
-      <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-        <div className="flex">
-          <div className="flex-shrink-0">
-            <svg
-              className="h-5 w-5 text-red-500"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-          <div className="ml-3">
-            <p className="text-sm text-red-700">{error}</p>
-          </div>
+      <div
+        className="min-h-screen flex items-center justify-center px-4"
+        style={{ background: "linear-gradient(180deg,#fffbeb 0%,#fef3c7 40%,#fff 100%)" }}
+      >
+        <div className="bg-white rounded-2xl border border-red-100 shadow p-6 max-w-sm w-full text-center">
+          <AlertCircle size={36} className="text-red-400 mx-auto mb-3" />
+          <p className="text-gray-700 font-semibold mb-1">Something went wrong</p>
+          <p className="text-gray-400 text-sm mb-4">{error}</p>
+          <button onClick={handleRefresh}
+            className="px-5 py-2 bg-amber-400 hover:bg-amber-500 text-white text-sm font-bold rounded-full transition">
+            Try Again
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 pt-[18vh]">
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="px-6 py-5 border-b border-gray-200 flex justify-between items-center">
-          <h2 className="text-2xl font-semibold text-gray-800">
-            My Order History
-          </h2>
+    <div
+      className="min-h-screen pt-[12vh] pb-20 px-4 md:px-6"
+      style={{ background: "linear-gradient(180deg,#fffbeb 0%,#fef3c7 40%,#fff 100%)" }}
+    >
+      <div className="container mx-auto max-w-3xl">
+
+        {/* Header */}
+        <div className="flex items-center justify-between py-7">
+          <div>
+            <h1 className="text-2xl font-extrabold text-gray-800">
+              My <span className="text-amber-500">Orders</span>
+            </h1>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {sorted.length} order{sorted.length !== 1 ? "s" : ""} total
+            </p>
+          </div>
           <button
             onClick={handleRefresh}
-            className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded-md cursor-pointer"
+            disabled={refreshing}
+            className="flex items-center gap-1.5 px-4 py-2 bg-white border border-amber-200 hover:bg-amber-50 text-amber-600 text-xs font-bold rounded-full shadow-sm transition"
           >
+            <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
             Refresh
           </button>
         </div>
 
-        {orders?.length === 0 ? (
-          <div className="text-center py-12">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-              />
-            </svg>
-            <h3 className="mt-2 text-lg font-medium text-gray-900">
-              No orders yet
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              You haven't placed any orders.{" "}
-              <Link to="/menu" className="text-blue-600 hover:text-blue-500">
-                Browse our menu
-              </Link>{" "}
-              to get started.
+        {/* Empty */}
+        {sorted.length === 0 && (
+          <div className="bg-white rounded-2xl border border-amber-100 shadow-sm py-20 text-center">
+            <span className="text-6xl block mb-4">🐟</span>
+            <p className="font-bold text-gray-700 text-lg mb-1">No orders yet</p>
+            <p className="text-gray-400 text-sm mb-6">
+              You haven&apos;t placed any orders — time to fix that!
             </p>
+            <Link
+              to="/menu"
+              className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-500 text-white text-sm font-bold px-6 py-2.5 rounded-full shadow transition"
+            >
+              <ShoppingBag size={15} /> Browse Menu
+            </Link>
           </div>
-        ) : (
-          <div className="divide-y divide-gray-200">
-            {[...orders]
-              ?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sort most recent first
-              .map((order) => (
-                <div key={order._id} className="px-6 py-5">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center space-x-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                          order.payment.status
-                        )}`}
-                      >
-                        {order.payment.status}
-                      </span>
-                      <span
-                        className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-800 font-medium"
-                        title="Order Status"
-                      >
-                        {order.orderStatus}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">
-                        Order #{order._id.slice(-6).toUpperCase()}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Ordered on:{" "}
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="mt-3 sm:mt-0">
-                      <p className="text-lg font-semibold text-gray-900">
-                        ${order.totalAmount.toFixed(2)}
-                      </p>
-                      <button
-                        onClick={() => handleDownloadReceipt(order)}
-                        className="bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-1 rounded-md"
-                      >
-                        Download Receipt
-                      </button>
-                    </div>
+        )}
+
+        {/* Order cards */}
+        <div className="space-y-4">
+          {sorted.map((order) => {
+            const isOpen = expanded[order._id];
+            return (
+              <div
+                key={order._id}
+                className="bg-white rounded-2xl border border-amber-100 shadow-sm overflow-hidden"
+              >
+                {/* Card header — always visible */}
+                <div
+                  className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 cursor-pointer hover:bg-amber-50/50 transition"
+                  onClick={() => toggleExpand(order._id)}
+                >
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <StatusBadge label={order.payment.status} map={PAYMENT_STATUS} />
+                    <StatusBadge
+                      label={order.orderStatus}
+                      map={ORDER_STATUS}
+                      fallback="bg-gray-50 text-gray-600 border border-gray-200"
+                    />
                   </div>
 
-                  <div className="mt-4">
-                    <p className="text-sm text-gray-500 mb-2">
-                      Payment: {order.payment.method}{" "}
+                  <div className="flex items-center gap-4 ml-auto">
+                    <div className="text-right">
+                      <p className="text-xs text-gray-400">
+                        {new Date(order.createdAt).toLocaleDateString("en-GB", {
+                          day: "numeric", month: "short", year: "numeric",
+                        })}
+                      </p>
+                      <p className="text-xs font-mono text-gray-500">
+                        #{order._id.slice(-6).toUpperCase()}
+                      </p>
+                    </div>
+                    <span className="text-amber-600 font-extrabold text-base whitespace-nowrap">
+                      ${order.totalAmount.toFixed(2)}
+                    </span>
+                    {isOpen
+                      ? <ChevronUp size={16} className="text-gray-400 shrink-0" />
+                      : <ChevronDown size={16} className="text-gray-400 shrink-0" />
+                    }
+                  </div>
+                </div>
+
+                {/* Expanded detail */}
+                {isOpen && (
+                  <div className="border-t border-amber-50 px-5 py-4 space-y-4">
+
+                    {/* Payment info */}
+                    <div className="flex flex-wrap gap-4 text-xs text-gray-500">
+                      <span className="flex items-center gap-1.5">
+                        <CreditCard size={12} className="text-amber-400" />
+                        {order.payment.method}
+                      </span>
                       {order.payment.transitionId && (
-                        <>
-                          | Transaction ID:{" "}
-                          <span className="text-gray-700 font-mono">
-                            {order.payment.transitionId}
-                          </span>
-                        </>
+                        <span className="flex items-center gap-1.5 font-mono">
+                          <Hash size={12} className="text-amber-400" />
+                          {order.payment.transitionId}
+                        </span>
                       )}
-                    </p>
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">
-                      Items:
-                    </h4>
+                    </div>
+
+                    {/* Items */}
                     <div className="space-y-3">
-                      {order.items.map((item, index) => (
-                        <div key={index} className="flex items-start">
-                          {item.food?.imageUrl ? (
-                            <img
-                              className="h-16 w-16 rounded-md object-cover"
-                              src={item.food.imageUrl}
-                              alt={item.food.title || "Food item"}
-                            />
-                          ) : (
-                            <div className="h-16 w-16 rounded-md bg-gray-100 flex items-center justify-center text-gray-400 text-xs">
-                              No image
-                            </div>
-                          )}
-                          <div className="ml-4 flex-1">
-                            <div className="flex items-center justify-between">
-                              <p className="text-sm font-medium text-gray-900">
+                      {order.items.map((item, i) => (
+                        <div key={i} className="flex gap-3 items-start">
+                          <div className="w-14 h-14 shrink-0 rounded-xl overflow-hidden bg-amber-50 border border-amber-100">
+                            {item.food?.imageUrl ? (
+                              <img
+                                src={item.food.imageUrl}
+                                alt={item.food.title}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-amber-300 text-xl">🐟</div>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="text-sm font-semibold text-gray-800 leading-snug">
                                 {item.food?.title || "Unknown Item"}
                               </p>
-                              <p className="text-sm text-gray-500 ml-2">
+                              <span className="text-sm font-bold text-amber-600 shrink-0">
                                 ${item.price.toFixed(2)}
-                              </p>
+                              </span>
                             </div>
-                            <p className="text-sm text-gray-500">
-                              Qty: {item.quantity}
+                            <p className="text-xs text-gray-400 mt-0.5">
+                              Qty: {item.quantity} ·{" "}
+                              ${(item.price * item.quantity).toFixed(2)} total
                             </p>
                             <ReviewForm foodId={item.food?._id} />
                           </div>
                         </div>
                       ))}
                     </div>
+
+                    {/* Footer */}
+                    <div className="flex items-center justify-between pt-3 border-t border-amber-50">
+                      <div className="text-sm text-gray-600">
+                        <span className="text-gray-400">Total paid: </span>
+                        <span className="font-extrabold text-amber-600 text-base">
+                          ${order.totalAmount.toFixed(2)}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleDownloadReceipt(order)}
+                        className="flex items-center gap-1.5 px-4 py-2 bg-amber-400 hover:bg-amber-500 active:scale-95 text-white text-xs font-bold rounded-full shadow transition"
+                      >
+                        <Download size={13} /> Receipt
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
-          </div>
-        )}
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
